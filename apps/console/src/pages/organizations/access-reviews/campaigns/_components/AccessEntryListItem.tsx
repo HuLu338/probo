@@ -25,6 +25,7 @@ import { graphql, useFragment } from "react-relay";
 
 import type { AccessEntryListItem_entry$key } from "#/__generated__/core/AccessEntryListItem_entry.graphql";
 
+import { AccessEntryExtraRolesPopover } from "../../_components/AccessEntryExtraRolesPopover";
 import {
   AdminStatus,
   AuthMethodStatus,
@@ -83,7 +84,7 @@ export function AccessEntryListItem({
   const email = entry.email.trim();
   const title = fullName || email;
   const role = entry.roles[0] ?? null;
-  const extraRoles = entry.roles.length > 1 ? entry.roles.length - 1 : 0;
+  const extraRoles = entry.roles.slice(1);
 
   return (
     <li className={item()}>
@@ -126,13 +127,17 @@ export function AccessEntryListItem({
             : null}
           {role
             ? (
-                <span className="truncate" title={entry.roles.join(", ")}>
+                <span className="truncate" title={role}>
                   {role}
                 </span>
               )
             : null}
-          {extraRoles > 0 && (
-            <span className="shrink-0">{`+${extraRoles}`}</span>
+          {extraRoles.length > 0 && (
+            <AccessEntryExtraRolesPopover
+              roles={extraRoles}
+              className="shrink-0 cursor-pointer hover:text-txt-primary"
+              trigger={`+${extraRoles.length}`}
+            />
           )}
         </div>
       </div>
