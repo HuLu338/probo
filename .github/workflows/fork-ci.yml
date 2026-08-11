@@ -1,0 +1,67 @@
+name: "fork-ci"
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+concurrency:
+  group: "fork-ci-${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: "read"
+
+jobs:
+  malaysia-pdpa:
+    name: "Malaysia PDPA validation"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v6
+        with:
+          submodules: recursive
+      - uses: "./.github/actions/setup"
+      - name: "Generate Relay artifacts"
+        run: "make relay"
+      - name: "Check generated artifacts"
+        run: "git diff --exit-code"
+      - name: "Test Malaysia PDPA overdue status"
+        if: hashFiles('pkg/malaysiapdpa/**') != ''
+        run: >-
+          go test ./pkg/server/api/console/v1/types
+          -run '^TestNewMalaysiaPDPAProfile_CommissionerNotificationOverdue$'
+          -count=1
+      - name: "Test console GraphQL types"
+        if: hashFiles('pkg/malaysiapdpa/**') != ''
+        run: "go test ./pkg/server/api/console/v1/types"
+      - name: "Compile console GraphQL API"
+        if: hashFiles('pkg/malaysiapdpa/**') != ''
+        run: "go test ./pkg/server/api/console/v1 -run '^$'"
+      - name: "Compile MCP GraphQL API"
+        if: hashFiles('pkg/malaysiapdpa/**') != ''
+        run: "go test ./pkg/server/api/mcp/v1 -run '^$'"
+      - name: "Compile core data package"
+        run: "go test ./pkg/coredata -run '^$'"
+      - name: "Compile Malaysia PDPA package"
+        if: hashFiles('pkg/malaysiapdpa/**') != ''
+        run: "go test ./pkg/malaysiapdpa -run '^$'"
+      - name: "Check console"
+        run: "npm --workspace @probo/console run check"
+      - name: "Check whitespace"
+        run: "git diff --check"
+
+  secrets:
+    name: "Secret scan"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - uses: "trufflesecurity/trufflehog@6f3c981e7b77f235fd2702dd74af25fc4b72bf11" # main
+        with:
+          extra_args: "--results=verified,unknown"
