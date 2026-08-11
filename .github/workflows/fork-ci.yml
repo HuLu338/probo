@@ -27,6 +27,9 @@ jobs:
       - uses: "./.github/actions/setup"
       - name: "Generate Relay artifacts"
         run: "make relay"
+      - name: "Build embedded email assets"
+        if: hashFiles('pkg/malaysiapdpa/**') != ''
+        run: "npm --workspace @probo/emails run build"
       - name: "Generate Malaysia PDPA GraphQL APIs"
         if: hashFiles('pkg/malaysiapdpa/**') != ''
         run: |
