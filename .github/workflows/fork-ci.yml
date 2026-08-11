@@ -27,6 +27,11 @@ jobs:
       - uses: "./.github/actions/setup"
       - name: "Generate Relay artifacts"
         run: "make relay"
+      - name: "Generate Malaysia PDPA GraphQL APIs"
+        if: hashFiles('pkg/malaysiapdpa/**') != ''
+        run: |
+          go generate ./pkg/server/api/console/v1
+          go generate ./pkg/server/api/mcp/v1
       - name: "Check generated artifacts"
         run: "git diff --exit-code"
       - name: "Test Malaysia PDPA overdue status"
