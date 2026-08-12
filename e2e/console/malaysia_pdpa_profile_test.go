@@ -46,6 +46,7 @@ const (
 						dpoProfileId
 						dpoAppointedAt
 						commissionerNotificationDueAt
+						commissionerNotificationOverdue
 						commissionerNotifiedAt
 						commissionerNotificationReference
 						createdAt
@@ -71,6 +72,7 @@ const (
 					dpoProfileId
 					dpoAppointedAt
 					commissionerNotificationDueAt
+					commissionerNotificationOverdue
 					commissionerNotifiedAt
 					commissionerNotificationReference
 					createdAt
@@ -93,6 +95,7 @@ type malaysiaPDPAProfileResult struct {
 	DPOProfileID                      *string    `json:"dpoProfileId"`
 	DPOAppointedAt                    *time.Time `json:"dpoAppointedAt"`
 	CommissionerNotificationDueAt     *time.Time `json:"commissionerNotificationDueAt"`
+	CommissionerNotificationOverdue   bool       `json:"commissionerNotificationOverdue"`
 	CommissionerNotifiedAt            *time.Time `json:"commissionerNotifiedAt"`
 	CommissionerNotificationReference *string    `json:"commissionerNotificationReference"`
 	CreatedAt                         *time.Time `json:"createdAt"`
@@ -183,6 +186,76 @@ func TestMalaysiaPDPAProfile_ExactThresholdsDoNotTrigger(t *testing.T) {
 	profile := result.UpdateMalaysiaPDPAProfile.MalaysiaPDPAProfile
 	assert.False(t, profile.DPORequired)
 	assert.Empty(t, profile.DPORequirementReasons)
+}
+
+func TestMalaysiaPDPAProfile_CommissionerNotificationOverdue(t *testing.T) {
+	t.Parallel()
+
+	dpoAppointedAt := time.Date(2000, time.January, 1, 12, 0, 0, 0, time.UTC)
+	commissionerNotificationDueAt := dpoAppointedAt.AddDate(0, 0, 21)
+	commissionerNotifiedAfterDeadline := commissionerNotificationDueAt.Add(time.Second)
+
+	tests := []struct {
+		name                        string
+		commissionerNotifiedAt      *time.Time
+		expectedNotificationOverdue bool
+	}{
+		{
+			name:                        "unnotified after deadline",
+			commissionerNotifiedAt:      nil,
+			expectedNotificationOverdue: true,
+		},
+		{
+			name:                        "notified exactly at deadline",
+			commissionerNotifiedAt:      &commissionerNotificationDueAt,
+			expectedNotificationOverdue: false,
+		},
+		{
+			name:                        "notified one second after deadline",
+			commissionerNotifiedAt:      &commissionerNotifiedAfterDeadline,
+			expectedNotificationOverdue: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(
+			tt.name,
+			func(t *testing.T) {
+				t.Parallel()
+
+				owner := testutil.NewClient(t, testutil.RoleOwner)
+				input := map[string]any{
+					"organizationId":              owner.GetOrganizationID().String(),
+					"totalDataSubjects":           0,
+					"sensitiveDataSubjects":       0,
+					"regularSystematicMonitoring": false,
+					"dpoProfileId":                owner.GetProfileID().String(),
+					"dpoAppointedAt":              dpoAppointedAt.Format(time.RFC3339),
+				}
+				if tt.commissionerNotifiedAt != nil {
+					input["commissionerNotifiedAt"] = tt.commissionerNotifiedAt.Format(time.RFC3339)
+				}
+
+				var result struct {
+					UpdateMalaysiaPDPAProfile struct {
+						MalaysiaPDPAProfile malaysiaPDPAProfileResult `json:"malaysiaPDPAProfile"`
+					} `json:"updateMalaysiaPDPAProfile"`
+				}
+
+				err := owner.Execute(
+					updateMalaysiaPDPAProfileMutation,
+					map[string]any{"input": input},
+					&result,
+				)
+				require.NoError(t, err)
+
+				profile := result.UpdateMalaysiaPDPAProfile.MalaysiaPDPAProfile
+				require.NotNil(t, profile.CommissionerNotificationDueAt)
+				assert.Equal(t, commissionerNotificationDueAt, *profile.CommissionerNotificationDueAt)
+				assert.Equal(t, tt.expectedNotificationOverdue, profile.CommissionerNotificationOverdue)
+			},
+		)
+	}
 }
 
 func TestMalaysiaPDPAProfile_RBAC(t *testing.T) {
@@ -301,4 +374,26 @@ func TestMalaysiaPDPAProfile_RejectsSensitiveCountAboveTotal(t *testing.T) {
 	)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "sensitive_data_subjects")
+}
+
+func TestMalaysiaPDPAProfile_RejectsDPOFromAnotherOrganization(t *testing.T) {
+	t.Parallel()
+
+	owner := testutil.NewClient(t, testutil.RoleOwner)
+	foreignOwner := testutil.NewClient(t, testutil.RoleOwner)
+
+	_, err := owner.Do(
+		updateMalaysiaPDPAProfileMutation,
+		map[string]any{
+			"input": map[string]any{
+				"organizationId":              owner.GetOrganizationID().String(),
+				"totalDataSubjects":           100,
+				"sensitiveDataSubjects":       10,
+				"regularSystematicMonitoring": false,
+				"dpoProfileId":                foreignOwner.GetProfileID().String(),
+				"dpoAppointedAt":              time.Date(2026, time.August, 1, 9, 0, 0, 0, time.UTC).Format(time.RFC3339),
+			},
+		},
+	)
+	testutil.RequireErrorCode(t, err, "INTERNAL", "must not appoint a DPO from another organization")
 }

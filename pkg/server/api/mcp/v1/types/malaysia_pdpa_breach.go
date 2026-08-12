@@ -81,7 +81,7 @@ func NewMalaysiaPDPABreachIncident(incident *coredata.MalaysiaPDPABreachIncident
 		RuleVersion:                        incident.RuleVersion,
 		RuleSource:                         incident.RuleSource,
 		CommissionerNotificationDueAt:      assessment.CommissionerNotificationDueAt,
-		CommissionerNotificationOverdue:    malaysiaPDPABreachDeadlineOverdue(assessment.CommissionerNotificationDueAt, incident.CommissionerNotifiedAt),
+		CommissionerNotificationOverdue:    malaysiaPDPADeadlineOverdue(assessment.CommissionerNotificationDueAt, incident.CommissionerNotifiedAt),
 		CommissionerNotifiedAt:             incident.CommissionerNotifiedAt,
 		CommissionerNotificationReference:  incident.CommissionerNotificationReference,
 		CommissionerConfirmationReceivedAt: incident.CommissionerConfirmationReceivedAt,
@@ -90,7 +90,7 @@ func NewMalaysiaPDPABreachIncident(incident *coredata.MalaysiaPDPABreachIncident
 		DelayedNotificationReason:          incident.DelayedNotificationReason,
 		DelayedNotificationEvidence:        incident.DelayedNotificationEvidence,
 		DataSubjectsNotificationDueAt:      assessment.DataSubjectNotificationDueAt,
-		DataSubjectsNotificationOverdue:    malaysiaPDPABreachDeadlineOverdue(assessment.DataSubjectNotificationDueAt, incident.DataSubjectsNotifiedAt),
+		DataSubjectsNotificationOverdue:    malaysiaPDPADeadlineOverdue(assessment.DataSubjectNotificationDueAt, incident.DataSubjectsNotifiedAt),
 		DataSubjectsNotifiedAt:             incident.DataSubjectsNotifiedAt,
 		DataSubjectsNotificationEvidence:   incident.DataSubjectsNotificationEvidence,
 		Status:                             incident.Status,
@@ -153,7 +153,7 @@ func NewListMalaysiaPDPABreachStatusHistoryOutput(
 	}
 }
 
-func malaysiaPDPABreachDeadlineOverdue(dueAt, completedAt *time.Time) bool {
+func malaysiaPDPADeadlineOverdue(dueAt, completedAt *time.Time) bool {
 	if dueAt == nil {
 		return false
 	}

@@ -9441,6 +9441,7 @@ components:
         - regular_systematic_monitoring
         - dpo_required
         - dpo_requirement_reasons
+        - commissioner_notification_overdue
       properties:
         organization_id:
           $ref: "#/components/schemas/GID"
@@ -9482,6 +9483,9 @@ components:
           type: string
           format: date-time
           description: Date by which the DPO appointment should be notified to the Commissioner
+        commissioner_notification_overdue:
+          type: boolean
+          description: Whether the notification deadline has passed or the notification was submitted after the deadline
         commissioner_notified_at:
           type: string
           format: date-time

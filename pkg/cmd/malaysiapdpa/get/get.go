@@ -47,6 +47,7 @@ query($id: ID!) {
         dpoProfileId
         dpoAppointedAt
         commissionerNotificationDueAt
+        commissionerNotificationOverdue
         commissionerNotifiedAt
         commissionerNotificationReference
         createdAt
@@ -71,6 +72,7 @@ type getResponse struct {
 			DPOProfileID                      *string  `json:"dpoProfileId"`
 			DPOAppointedAt                    *string  `json:"dpoAppointedAt"`
 			CommissionerNotificationDueAt     *string  `json:"commissionerNotificationDueAt"`
+			CommissionerNotificationOverdue   bool     `json:"commissionerNotificationOverdue"`
 			CommissionerNotifiedAt            *string  `json:"commissionerNotifiedAt"`
 			CommissionerNotificationReference *string  `json:"commissionerNotificationReference"`
 			CreatedAt                         *string  `json:"createdAt"`
@@ -168,6 +170,12 @@ func NewCmdGet(f *cmdutil.Factory) *cobra.Command {
 					cmdutil.FormatTime(*profile.CommissionerNotificationDueAt),
 				)
 			}
+			_, _ = fmt.Fprintf(
+				out,
+				"%s%t\n",
+				label.Render("Commissioner notification overdue:"),
+				profile.CommissionerNotificationOverdue,
+			)
 
 			return nil
 		},

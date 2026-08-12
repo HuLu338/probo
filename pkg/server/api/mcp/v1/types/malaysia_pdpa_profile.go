@@ -53,6 +53,7 @@ func NewMalaysiaPDPAProfile(p *coredata.MalaysiaPDPAProfile) *MalaysiaPDPAProfil
 		AssessedAt:                        p.AssessedAt,
 		AssessedByProfileID:               p.AssessedByProfileID,
 		CommissionerNotificationDueAt:     commissionerNotificationDueAt,
+		CommissionerNotificationOverdue:   malaysiaPDPADeadlineOverdue(commissionerNotificationDueAt, p.CommissionerNotifiedAt),
 		CommissionerNotificationReference: p.CommissionerNotificationReference,
 		CommissionerNotifiedAt:            p.CommissionerNotifiedAt,
 		CreatedAt:                         createdAt,

@@ -57,6 +57,7 @@
     "notification": {
       "title": "Notification au commissaire",
       "description": "Suivez la notification à effectuer dans les 21 jours suivant la désignation du DPO.",
+      "overdue": "En retard",
       "dueAt": {
         "label": "Échéance de notification"
       },
