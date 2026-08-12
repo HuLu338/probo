@@ -44,6 +44,12 @@ import (
 	"go.probo.inc/probo/pkg/llm"
 )
 
+type suspendableTestTool struct {
+	agent.Tool
+}
+
+func (suspendableTestTool) Suspendable() {}
+
 func TestWorker_PicksUpAndCompletes(t *testing.T) {
 	client := test.PGClient(t)
 	ag := newDummyAgent(
@@ -748,20 +754,21 @@ func TestWorker_StopAndResumeNestedSubAgentMultiLevel(t *testing.T) {
 	store := coredata.NewPGCheckpointer(client)
 
 	toolReady := make(chan struct{})
-	toolRelease := make(chan struct{})
 
 	var readyOnce sync.Once
 
-	slowTool := agent.FunctionTool[struct{}](
-		"slow_work",
-		"Does slow work",
-		func(_ context.Context, _ struct{}) (agent.ToolResult, error) {
-			readyOnce.Do(func() { close(toolReady) })
-			<-toolRelease
+	slowTool := suspendableTestTool{
+		Tool: agent.FunctionTool[struct{}](
+			"slow_work",
+			"Does slow work",
+			func(ctx context.Context, _ struct{}) (agent.ToolResult, error) {
+				readyOnce.Do(func() { close(toolReady) })
+				<-ctx.Done()
 
-			return agent.ToolResult{Content: "grandchild work done"}, nil
-		},
-	)
+				return agent.ToolResult{Content: "grandchild work done"}, nil
+			},
+		),
+	}
 
 	grandchildAgent := newDummyAgent(
 		"grandchild-agent",
@@ -840,8 +847,6 @@ func TestWorker_StopAndResumeNestedSubAgentMultiLevel(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("timed out waiting for worker shutdown broadcast")
 	}
-
-	close(toolRelease)
 
 	require.Eventually(
 		t,
