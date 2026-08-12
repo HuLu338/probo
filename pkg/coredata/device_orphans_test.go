@@ -183,7 +183,9 @@ func TestDevice_DeleteOrphans(t *testing.T) {
 
 		deleted, err := device.DeleteOrphans(ctx, tx, now)
 		require.NoError(t, err)
-		require.Equal(t, int64(3), deleted)
+		// DeleteOrphans is global, so a persistent local test database can also
+		// contain eligible rows left by earlier E2E runs.
+		require.GreaterOrEqual(t, deleted, int64(3))
 
 		var remaining coredata.Device
 		require.ErrorIs(t, remaining.LoadByID(ctx, tx, scope, orphanPendingID), coredata.ErrResourceNotFound)
