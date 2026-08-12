@@ -137,6 +137,27 @@ evidence, privileged accounts, and configuration weaknesses. Findings map to
 Malaysia PDPA controls but retain the original scanner evidence and rule
 version.
 
+The standalone CLI adapter imports an existing OpenList scan report through
+the scanner's authenticated `GET /scans/{id}` API:
+
+```sh
+OPENLIST_API_KEY=... prb malaysia-pdpa scanner import-openlist 42 \
+  --scanner-url http://openlist-scanner:8080 \
+  --target-id customer-a-openlist \
+  --rule-version 2026.08 \
+  --rule-source https://scanner.example/rules/openlist \
+  --org <organization-id>
+```
+
+`OPENLIST_API_KEY` stays in the adapter process environment instead of a
+command-line flag. The operator's Probo token authorizes the destination
+organization, and the scanner receives neither that token nor database access.
+The stable external identity is `<target-id>:<rule-id>`, so retrying or
+importing a later scan updates the same finding for that deployment and rule.
+The scanner API does not currently expose a rule-set version, so the adapter
+requires explicit rule-version and rule-source provenance. Local filesystem
+paths from the scanner report are intentionally excluded from Probo evidence.
+
 ## Deferred from the first release
 
 - subscriptions, invoicing, and payment collection;

@@ -94,6 +94,7 @@ type (
 		Evidences                             *EvidenceService
 		Organizations                         *OrganizationService
 		MalaysiaPDPABreaches                  *MalaysiaPDPABreachService
+		MalaysiaPDPAScannerFindings           *MalaysiaPDPAScannerFindingService
 		ThirdParties                          *ThirdPartyService
 		Documents                             *DocumentService
 		DocumentApprovals                     *DocumentApprovalService
@@ -207,6 +208,7 @@ func NewService(
 		),
 	}
 	svc.MalaysiaPDPABreaches = &MalaysiaPDPABreachService{svc: svc}
+	svc.MalaysiaPDPAScannerFindings = &MalaysiaPDPAScannerFindingService{svc: svc}
 	svc.Controls = &ControlService{svc: svc}
 	svc.Risks = &RiskService{svc: svc}
 	svc.ThirdPartyComplianceReports = &ThirdPartyComplianceReportService{

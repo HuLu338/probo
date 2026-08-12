@@ -61,6 +61,7 @@ import { useFormWithSchema } from "#/hooks/useFormWithSchema";
 import { useOrganizationId } from "#/hooks/useOrganizationId";
 import { z } from "#/lib/zod";
 
+import { FindingScannerEvidenceSection } from "./_components/FindingScannerEvidenceSection";
 import { FindingsConnectionKey } from "./FindingsPage";
 
 export const findingDetailsPageQuery = graphql`
@@ -88,6 +89,7 @@ export const findingDetailsPageQuery = graphql`
         }
         canUpdate: permission(action: "core:finding:update")
         canDelete: permission(action: "core:finding:delete")
+        ...FindingScannerEvidenceSection_finding
       }
     }
   }
@@ -387,7 +389,9 @@ export default function FindingDetailsPage(props: Props) {
         </ActionDropdown>
       </div>
 
-      <div className="max-w-4xl">
+      <div className="max-w-4xl space-y-6">
+        <FindingScannerEvidenceSection findingKey={finding} />
+
         <Card padded>
           <form onSubmit={e => void onSubmit(e)} className="space-y-6">
             <Field label={t("findingDetails.fields.description")}>

@@ -18,27 +18,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package malaysiapdpa
+package coredata_test
 
 import (
-	"github.com/spf13/cobra"
-	"go.probo.inc/probo/pkg/cmd/cmdutil"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/breach"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/get"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/scanner"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/update"
+	"encoding/json"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.probo.inc/probo/pkg/coredata"
+	"go.probo.inc/probo/pkg/crypto/cipher"
 )
 
-func NewCmdMalaysiaPDPA(f *cmdutil.Factory) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "malaysia-pdpa <command>",
-		Short: "Manage the Malaysia PDPA profile",
-	}
+func TestMalaysiaPDPAScannerFindingEvidenceEncryptionRoundTrip(t *testing.T) {
+	t.Parallel()
 
-	cmd.AddCommand(get.NewCmdGet(f))
-	cmd.AddCommand(update.NewCmdUpdate(f))
-	cmd.AddCommand(breach.NewCmdBreach(f))
-	cmd.AddCommand(scanner.NewCmdScanner(f))
+	evidence := json.RawMessage(`{"port":8443,"transport":"tcp"}`)
+	key := cipher.EncryptionKey{1, 2, 3, 4}
+	finding := &coredata.MalaysiaPDPAScannerFinding{}
 
-	return cmd
+	require.NoError(t, finding.EncryptEvidence(evidence, key))
+	assert.NotEqual(t, []byte(evidence), finding.EncryptedEvidence)
+
+	decrypted, err := finding.DecryptEvidence(key)
+	require.NoError(t, err)
+	assert.JSONEq(t, string(evidence), string(decrypted))
 }

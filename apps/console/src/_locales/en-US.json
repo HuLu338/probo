@@ -355,6 +355,7 @@
     "deleteConfirmation": "This will permanently delete the finding {{referenceId}}. This action cannot be undone.",
     "fields": { "description": "Description", "source": "Source", "owner": "Owner", "status": "Status", "priority": "Priority", "acceptedRisk": "Accepted risk", "dateIdentified": "Date identified", "dueDate": "Due date", "rootCause": "Root cause", "correctiveAction": "Corrective action", "effectivenessCheck": "Effectiveness check" },
     "placeholders": { "description": "Enter description", "source": "Enter source", "rootCause": "Enter root cause", "correctiveAction": "Enter corrective action", "effectivenessCheck": "Enter effectiveness check details" },
+    "scannerEvidence": { "title": "Scanner evidence", "description": "Read-only context captured when this finding was ingested.", "source": "Scanner source", "ruleVersion": "Rule version", "evidence": "Evidence" },
     "actions": { "delete": "Delete", "updating": "Updating...", "update": "Update" }
   },
   "findingsPage": {

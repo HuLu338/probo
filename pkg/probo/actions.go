@@ -44,6 +44,10 @@ const (
 	ActionMalaysiaPDPABreachUpdate     = "core:malaysia-pdpa-breach:update"
 	ActionMalaysiaPDPABreachTransition = "core:malaysia-pdpa-breach:transition"
 
+	// MalaysiaPDPAScannerFinding actions
+	ActionMalaysiaPDPAScannerFindingGet    = "core:malaysia-pdpa-scanner-finding:get"
+	ActionMalaysiaPDPAScannerFindingIngest = "core:malaysia-pdpa-scanner-finding:ingest"
+
 	// ThirdParty actions
 	ActionThirdPartyList    = "core:thirdParty:list"
 	ActionThirdPartyGet     = "core:thirdParty:get"

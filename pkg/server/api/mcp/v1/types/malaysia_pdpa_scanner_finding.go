@@ -18,27 +18,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package malaysiapdpa
+package types
 
 import (
-	"github.com/spf13/cobra"
-	"go.probo.inc/probo/pkg/cmd/cmdutil"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/breach"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/get"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/scanner"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/update"
+	"encoding/json"
+
+	"go.probo.inc/probo/pkg/coredata"
 )
 
-func NewCmdMalaysiaPDPA(f *cmdutil.Factory) *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "malaysia-pdpa <command>",
-		Short: "Manage the Malaysia PDPA profile",
+func NewMalaysiaPDPAScannerFinding(
+	scannerFinding *coredata.MalaysiaPDPAScannerFinding,
+	finding *coredata.Finding,
+	evidence json.RawMessage,
+) *MalaysiaPDPAScannerFinding {
+	return &MalaysiaPDPAScannerFinding{
+		ID:             scannerFinding.ID,
+		OrganizationID: scannerFinding.OrganizationID,
+		ExternalID:     scannerFinding.ExternalID,
+		Source:         scannerFinding.Source,
+		CheckKey:       scannerFinding.CheckKey,
+		Severity:       scannerFinding.Severity,
+		Summary:        scannerFinding.Summary,
+		Evidence:       string(evidence),
+		ObservedAt:     scannerFinding.ObservedAt,
+		RuleVersion:    scannerFinding.RuleVersion,
+		RuleSource:     scannerFinding.RuleSource,
+		Finding:        NewFinding(finding),
+		CreatedAt:      scannerFinding.CreatedAt,
+		UpdatedAt:      scannerFinding.UpdatedAt,
 	}
-
-	cmd.AddCommand(get.NewCmdGet(f))
-	cmd.AddCommand(update.NewCmdUpdate(f))
-	cmd.AddCommand(breach.NewCmdBreach(f))
-	cmd.AddCommand(scanner.NewCmdScanner(f))
-
-	return cmd
 }

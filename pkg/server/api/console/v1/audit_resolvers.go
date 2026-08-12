@@ -267,6 +267,30 @@ func (r *findingResolver) Organization(ctx context.Context, obj *types.Finding) 
 	return types.NewOrganization(organization), nil
 }
 
+// MalaysiaPDPAScannerFinding is the resolver for the malaysiaPDPAScannerFinding field.
+func (r *findingResolver) MalaysiaPDPAScannerFinding(ctx context.Context, obj *types.Finding) (*types.MalaysiaPDPAScannerFinding, error) {
+	scope, err := r.authorize(ctx, obj.ID, probo.ActionMalaysiaPDPAScannerFindingGet)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := r.probo.MalaysiaPDPAScannerFindings.GetByFindingID(ctx, scope, obj.ID)
+	if err != nil {
+		if errors.Is(err, coredata.ErrResourceNotFound) {
+			return nil, nil
+		}
+
+		r.logger.ErrorCtx(ctx, "cannot get Malaysia PDPA scanner finding for finding", log.Error(err))
+		return nil, gqlutils.Internal(ctx)
+	}
+
+	return types.NewMalaysiaPDPAScannerFinding(
+		result.ScannerFinding,
+		result.Finding,
+		result.Evidence,
+	), nil
+}
+
 // Audits is the resolver for the audits field.
 func (r *findingResolver) Audits(ctx context.Context, obj *types.Finding, first *int, after *page.CursorKey, last *int, before *page.CursorKey, orderBy *types.AuditOrderBy) (*types.AuditConnection, error) {
 	scope, err := r.authorize(ctx, obj.ID, probo.ActionAuditList)

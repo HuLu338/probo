@@ -768,6 +768,13 @@
       "correctiveAction": "Saisir l’action corrective",
       "effectivenessCheck": "Saisir les détails de la vérification de l’efficacité"
     },
+    "scannerEvidence": {
+      "title": "Preuves du scanner",
+      "description": "Contexte en lecture seule enregistré lors de l’ingestion de ce constat.",
+      "source": "Source du scanner",
+      "ruleVersion": "Version de la règle",
+      "evidence": "Preuves"
+    },
     "actions": {
       "delete": "Supprimer",
       "updating": "Mise à jour...",

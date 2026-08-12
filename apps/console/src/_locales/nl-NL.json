@@ -768,6 +768,13 @@
       "correctiveAction": "Voer corrigerende maatregel in",
       "effectivenessCheck": "Voer details van effectiviteitscontrole in"
     },
+    "scannerEvidence": {
+      "title": "Scannerbewijs",
+      "description": "Alleen-lezen context die is vastgelegd toen deze bevinding werd ingelezen.",
+      "source": "Scannerbron",
+      "ruleVersion": "Regelversie",
+      "evidence": "Bewijs"
+    },
     "actions": {
       "delete": "Verwijderen",
       "updating": "Bijwerken...",

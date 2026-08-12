@@ -20,6 +20,7 @@
 
 import type { INodeProperties } from 'n8n-workflow';
 import * as getOp from './get.operation';
+import * as ingestScannerFindingOp from './ingestScannerFinding.operation';
 import * as updateOp from './update.operation';
 
 export const description: INodeProperties[] = [
@@ -41,6 +42,12 @@ export const description: INodeProperties[] = [
 				action: 'Get the malaysia pdpa profile',
 			},
 			{
+				name: 'Ingest Scanner Finding',
+				value: 'ingestScannerFinding',
+				description: 'Create or update a scanner finding and its associated compliance finding',
+				action: 'Ingest a malaysia pdpa scanner finding',
+			},
+			{
 				name: 'Update',
 				value: 'update',
 				description: 'Update the Malaysia PDPA profile',
@@ -50,7 +57,12 @@ export const description: INodeProperties[] = [
 		default: 'get',
 	},
 	...getOp.description,
+	...ingestScannerFindingOp.description,
 	...updateOp.description,
 ];
 
-export { getOp as get, updateOp as update };
+export {
+	getOp as get,
+	ingestScannerFindingOp as ingestScannerFinding,
+	updateOp as update,
+};

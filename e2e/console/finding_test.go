@@ -48,6 +48,7 @@ func TestFinding_CreateNonconformity(t *testing.T) {
 						correctiveAction
 						status
 						priority
+						malaysiaPDPAScannerFinding { id }
 					}
 				}
 			}
@@ -66,6 +67,9 @@ func TestFinding_CreateNonconformity(t *testing.T) {
 					CorrectiveAction string `json:"correctiveAction"`
 					Status           string `json:"status"`
 					Priority         string `json:"priority"`
+					ScannerFinding   *struct {
+						ID string `json:"id"`
+					} `json:"malaysiaPDPAScannerFinding"`
 				} `json:"node"`
 			} `json:"findingEdge"`
 		} `json:"createFinding"`
@@ -93,6 +97,7 @@ func TestFinding_CreateNonconformity(t *testing.T) {
 	assert.Equal(t, "Implement MFA", node.CorrectiveAction)
 	assert.Equal(t, "OPEN", node.Status)
 	assert.Equal(t, "HIGH", node.Priority)
+	assert.Nil(t, node.ScannerFinding)
 }
 
 func TestFinding_CreateObservation(t *testing.T) {
