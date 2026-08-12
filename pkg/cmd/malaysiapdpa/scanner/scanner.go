@@ -18,27 +18,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package malaysiapdpa
+package scanner
 
 import (
 	"github.com/spf13/cobra"
 	"go.probo.inc/probo/pkg/cmd/cmdutil"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/breach"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/get"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/scanner"
-	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/update"
+	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/scanner/ingest"
 )
 
-func NewCmdMalaysiaPDPA(f *cmdutil.Factory) *cobra.Command {
+func NewCmdScanner(f *cmdutil.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "malaysia-pdpa <command>",
-		Short: "Manage the Malaysia PDPA profile",
+		Use:   "scanner <command>",
+		Short: "Manage Malaysia PDPA scanner findings",
 	}
 
-	cmd.AddCommand(get.NewCmdGet(f))
-	cmd.AddCommand(update.NewCmdUpdate(f))
-	cmd.AddCommand(breach.NewCmdBreach(f))
-	cmd.AddCommand(scanner.NewCmdScanner(f))
+	cmd.AddCommand(ingest.NewCmdIngest(f))
 
 	return cmd
 }

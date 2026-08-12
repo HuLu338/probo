@@ -109,6 +109,7 @@ var ViewerPolicy = policy.NewPolicy(
 		ActionMalaysiaPDPABreachGet,
 		ActionMalaysiaPDPABreachList,
 	).WithSID("malaysia-pdpa-breach-read").When(organizationCondition),
+	policy.Allow(ActionMalaysiaPDPAScannerFindingGet).WithSID("malaysia-pdpa-scanner-finding-read").When(organizationCondition),
 	policy.Allow(
 		ActionDocumentVersionExportPDF, ActionDocumentVersionSign,
 	).WithSID("document-signing").When(organizationCondition),
@@ -139,6 +140,7 @@ var AuditorPolicy = policy.NewPolicy(
 		ActionMalaysiaPDPABreachGet,
 		ActionMalaysiaPDPABreachList,
 	).WithSID("malaysia-pdpa-breach-read").When(organizationCondition),
+	policy.Allow(ActionMalaysiaPDPAScannerFindingGet).WithSID("malaysia-pdpa-scanner-finding-read").When(organizationCondition),
 
 	policy.Allow(
 		ActionThirdPartyGet, ActionThirdPartyList,

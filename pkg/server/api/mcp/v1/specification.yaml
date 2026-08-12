@@ -10061,6 +10061,131 @@ components:
           items:
             $ref: "#/components/schemas/MalaysiaPDPABreachStatusHistory"
 
+    MalaysiaPDPAScannerCheckKey:
+      type: string
+      enum:
+        - MFA
+        - EXPOSED_SERVICES
+        - TLS
+        - TOKEN_LIFETIME
+        - BACKUP_EVIDENCE
+        - PRIVILEGED_ACCOUNTS
+        - CONFIGURATION_WEAKNESSES
+      go.probo.inc/mcpgen/type: go.probo.inc/probo/pkg/coredata.MalaysiaPDPAScannerCheckKey
+
+    MalaysiaPDPAScannerFindingSeverity:
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - CRITICAL
+      go.probo.inc/mcpgen/type: go.probo.inc/probo/pkg/coredata.MalaysiaPDPAScannerFindingSeverity
+
+    MalaysiaPDPAScannerFinding:
+      type: object
+      required:
+        - id
+        - organization_id
+        - external_id
+        - source
+        - check_key
+        - severity
+        - summary
+        - evidence
+        - observed_at
+        - rule_version
+        - rule_source
+        - finding
+        - created_at
+        - updated_at
+      properties:
+        id:
+          $ref: "#/components/schemas/GID"
+        organization_id:
+          $ref: "#/components/schemas/GID"
+        external_id:
+          type: string
+        source:
+          type: string
+        check_key:
+          $ref: "#/components/schemas/MalaysiaPDPAScannerCheckKey"
+        severity:
+          $ref: "#/components/schemas/MalaysiaPDPAScannerFindingSeverity"
+        summary:
+          type: string
+        evidence:
+          type: string
+          description: Scanner evidence as a non-empty JSON object
+        observed_at:
+          type: string
+          format: date-time
+        rule_version:
+          type: string
+        rule_source:
+          type: string
+        finding:
+          $ref: "#/components/schemas/Finding"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    IngestMalaysiaPDPAScannerFindingInput:
+      type: object
+      required:
+        - organization_id
+        - external_id
+        - source
+        - check_key
+        - severity
+        - summary
+        - evidence
+        - observed_at
+        - rule_version
+        - rule_source
+      properties:
+        organization_id:
+          $ref: "#/components/schemas/GID"
+        external_id:
+          type: string
+          description: Stable scanner-side finding identifier
+        source:
+          type: string
+          description: Stable scanner integration name
+        check_key:
+          $ref: "#/components/schemas/MalaysiaPDPAScannerCheckKey"
+        severity:
+          $ref: "#/components/schemas/MalaysiaPDPAScannerFindingSeverity"
+        summary:
+          type: string
+        evidence:
+          type: string
+          description: Scanner evidence as a non-empty JSON object
+        observed_at:
+          type: string
+          format: date-time
+        rule_version:
+          type: string
+        rule_source:
+          type: string
+
+    IngestMalaysiaPDPAScannerFindingOutput:
+      type: object
+      required:
+        - scanner_finding
+        - finding
+        - created
+      properties:
+        scanner_finding:
+          $ref: "#/components/schemas/MalaysiaPDPAScannerFinding"
+        finding:
+          $ref: "#/components/schemas/Finding"
+        created:
+          type: boolean
+
     OrganizationContext:
       type: object
       required:
@@ -17421,6 +17546,18 @@ tools:
       $ref: "#/components/schemas/ListMalaysiaPDPABreachStatusHistoryInput"
     outputSchema:
       $ref: "#/components/schemas/ListMalaysiaPDPABreachStatusHistoryOutput"
+  - name: ingestMalaysiaPDPAScannerFinding
+    title: Ingest Malaysia PDPA Scanner Finding
+    description: Create or update a Malaysia PDPA scanner finding and its associated compliance finding
+    hints:
+      readonly: false
+      destructive: false
+      idempotent: true
+      openWorld: false
+    inputSchema:
+      $ref: "#/components/schemas/IngestMalaysiaPDPAScannerFindingInput"
+    outputSchema:
+      $ref: "#/components/schemas/IngestMalaysiaPDPAScannerFindingOutput"
   - name: getOrganizationContext
     title: Get Organization Context
     description: Get the organization context containing structured sections about the company

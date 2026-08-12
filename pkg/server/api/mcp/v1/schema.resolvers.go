@@ -9052,6 +9052,50 @@ func (r *Resolver) PublishBusinessFunctionListTool(ctx context.Context, req *mcp
 	}, nil
 }
 
+func (r *Resolver) IngestMalaysiaPDPAScannerFindingTool(ctx context.Context, req *mcp.CallToolRequest, input *types.IngestMalaysiaPDPAScannerFindingInput) (*mcp.CallToolResult, types.IngestMalaysiaPDPAScannerFindingOutput, error) {
+	scope, err := r.Authorize(ctx, input.OrganizationID, probo.ActionMalaysiaPDPAScannerFindingIngest)
+	if err != nil {
+		return nil, types.IngestMalaysiaPDPAScannerFindingOutput{}, err
+	}
+
+	result, err := r.proboSvc.MalaysiaPDPAScannerFindings.Ingest(
+		ctx,
+		scope,
+		&probo.IngestMalaysiaPDPAScannerFindingRequest{
+			OrganizationID: input.OrganizationID,
+			ExternalID:     input.ExternalID,
+			Source:         input.Source,
+			CheckKey:       input.CheckKey,
+			Severity:       input.Severity,
+			Summary:        input.Summary,
+			Evidence:       json.RawMessage(input.Evidence),
+			ObservedAt:     input.ObservedAt,
+			RuleVersion:    input.RuleVersion,
+			RuleSource:     input.RuleSource,
+		},
+	)
+	if err != nil {
+		if validationErrors, ok := errors.AsType[validator.ValidationErrors](err); ok {
+			return nil, types.IngestMalaysiaPDPAScannerFindingOutput{}, validationErrors
+		}
+
+		r.logger.ErrorCtx(ctx, "cannot ingest Malaysia PDPA scanner finding", log.Error(err))
+		return nil, types.IngestMalaysiaPDPAScannerFindingOutput{}, fmt.Errorf("internal server error")
+	}
+
+	scannerFinding := types.NewMalaysiaPDPAScannerFinding(
+		result.ScannerFinding,
+		result.Finding,
+		result.Evidence,
+	)
+
+	return nil, types.IngestMalaysiaPDPAScannerFindingOutput{
+		ScannerFinding: scannerFinding,
+		Finding:        scannerFinding.Finding,
+		Created:        result.Created,
+	}, nil
+}
+
 // ==============================================================================
 // Orphaned Handlers
 // ==============================================================================

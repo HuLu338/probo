@@ -144,6 +144,20 @@ func (r *queryResolver) Node(ctx context.Context, id gid.GID) (types.Node, error
 
 			return types.NewMalaysiaPDPABreachIncident(incident), nil
 		}
+	case coredata.MalaysiaPDPAScannerFindingEntityType:
+		action = probo.ActionMalaysiaPDPAScannerFindingGet
+		loadNode = func(ctx context.Context, scope *coredata.Scope, id gid.GID) (types.Node, error) {
+			result, err := r.probo.MalaysiaPDPAScannerFindings.Get(ctx, scope, id)
+			if err != nil {
+				return nil, err
+			}
+
+			return types.NewMalaysiaPDPAScannerFinding(
+				result.ScannerFinding,
+				result.Finding,
+				result.Evidence,
+			), nil
+		}
 	case coredata.RiskAnalysisEntityType:
 		action = probo.ActionRiskAnalysisGet
 		loadNode = func(ctx context.Context, scope *coredata.Scope, id gid.GID) (types.Node, error) {
