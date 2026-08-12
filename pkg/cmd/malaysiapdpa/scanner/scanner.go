@@ -23,6 +23,7 @@ package scanner
 import (
 	"github.com/spf13/cobra"
 	"go.probo.inc/probo/pkg/cmd/cmdutil"
+	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/scanner/importopenlist"
 	"go.probo.inc/probo/pkg/cmd/malaysiapdpa/scanner/ingest"
 )
 
@@ -33,6 +34,7 @@ func NewCmdScanner(f *cmdutil.Factory) *cobra.Command {
 	}
 
 	cmd.AddCommand(ingest.NewCmdIngest(f))
+	cmd.AddCommand(importopenlist.NewCmdImportOpenList(f))
 
 	return cmd
 }

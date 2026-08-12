@@ -131,13 +131,33 @@ func (s *MalaysiaPDPAScannerFindingService) Get(
 	scope coredata.Scoper,
 	id gid.GID,
 ) (*MalaysiaPDPAScannerFindingResult, error) {
+	return s.get(ctx, scope, func(ctx context.Context, conn pg.Querier, scannerFinding *coredata.MalaysiaPDPAScannerFinding) error {
+		return scannerFinding.LoadByID(ctx, conn, scope, id)
+	})
+}
+
+func (s *MalaysiaPDPAScannerFindingService) GetByFindingID(
+	ctx context.Context,
+	scope coredata.Scoper,
+	findingID gid.GID,
+) (*MalaysiaPDPAScannerFindingResult, error) {
+	return s.get(ctx, scope, func(ctx context.Context, conn pg.Querier, scannerFinding *coredata.MalaysiaPDPAScannerFinding) error {
+		return scannerFinding.LoadByFindingID(ctx, conn, scope, findingID)
+	})
+}
+
+func (s *MalaysiaPDPAScannerFindingService) get(
+	ctx context.Context,
+	scope coredata.Scoper,
+	load func(context.Context, pg.Querier, *coredata.MalaysiaPDPAScannerFinding) error,
+) (*MalaysiaPDPAScannerFindingResult, error) {
 	result := &MalaysiaPDPAScannerFindingResult{
 		ScannerFinding: &coredata.MalaysiaPDPAScannerFinding{},
 		Finding:        &coredata.Finding{},
 	}
 
 	err := s.svc.pg.WithConn(ctx, func(ctx context.Context, conn pg.Querier) error {
-		if err := result.ScannerFinding.LoadByID(ctx, conn, scope, id); err != nil {
+		if err := load(ctx, conn, result.ScannerFinding); err != nil {
 			return fmt.Errorf("cannot load Malaysia PDPA scanner finding: %w", err)
 		}
 

@@ -53,6 +53,7 @@ type malaysiaPDPAScannerFindingResult struct {
 	Severity       string `json:"severity"`
 	Summary        string `json:"summary"`
 	Evidence       string `json:"evidence"`
+	RuleVersion    string `json:"ruleVersion"`
 	Finding        struct {
 		ID          string  `json:"id"`
 		ReferenceID string  `json:"referenceId"`
@@ -125,6 +126,26 @@ func TestMalaysiaPDPAScannerFinding_IdempotentIngestionAndRBAC(t *testing.T) {
 	assert.Equal(t, created.ScannerFinding.ID, viewerNode.Node.ID)
 	assert.JSONEq(t, input["evidence"].(string), viewerNode.Node.Evidence)
 
+	var viewerFindingNode struct {
+		Node *struct {
+			ID             string                            `json:"id"`
+			ScannerFinding *malaysiaPDPAScannerFindingResult `json:"malaysiaPDPAScannerFinding"`
+		} `json:"node"`
+	}
+	err = viewer.Execute(
+		`query($id: ID!) { node(id: $id) { ... on Finding { id malaysiaPDPAScannerFinding { id source ruleVersion evidence } } } }`,
+		map[string]any{"id": created.ScannerFinding.Finding.ID},
+		&viewerFindingNode,
+	)
+	require.NoError(t, err)
+	require.NotNil(t, viewerFindingNode.Node)
+	require.NotNil(t, viewerFindingNode.Node.ScannerFinding)
+	assert.Equal(t, created.ScannerFinding.Finding.ID, viewerFindingNode.Node.ID)
+	assert.Equal(t, created.ScannerFinding.ID, viewerFindingNode.Node.ScannerFinding.ID)
+	assert.Equal(t, input["source"], viewerFindingNode.Node.ScannerFinding.Source)
+	assert.Equal(t, input["ruleVersion"], viewerFindingNode.Node.ScannerFinding.RuleVersion)
+	assert.JSONEq(t, input["evidence"].(string), viewerFindingNode.Node.ScannerFinding.Evidence)
+
 	_, err = viewer.Do(ingestMalaysiaPDPAScannerFindingMutation, map[string]any{"input": input})
 	testutil.RequireForbiddenError(t, err, "viewer cannot ingest Malaysia PDPA scanner findings")
 
@@ -133,6 +154,18 @@ func TestMalaysiaPDPAScannerFinding_IdempotentIngestionAndRBAC(t *testing.T) {
 	}
 	err = otherOwner.Execute(`query($id: ID!) { node(id: $id) { ... on MalaysiaPDPAScannerFinding { id } } }`, map[string]any{"id": created.ScannerFinding.ID}, &inaccessible)
 	testutil.AssertNodeNotAccessible(t, err, inaccessible.Node == nil, "Malaysia PDPA scanner finding")
+
+	var inaccessibleFinding struct {
+		Node *struct {
+			ID string `json:"id"`
+		} `json:"node"`
+	}
+	err = otherOwner.Execute(
+		`query($id: ID!) { node(id: $id) { ... on Finding { id malaysiaPDPAScannerFinding { id } } } }`,
+		map[string]any{"id": created.ScannerFinding.Finding.ID},
+		&inaccessibleFinding,
+	)
+	testutil.AssertNodeNotAccessible(t, err, inaccessibleFinding.Node == nil, "scanner-associated finding")
 }
 
 func ingestMalaysiaPDPAScannerFinding(

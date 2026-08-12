@@ -198,6 +198,8 @@ type Finding implements Node {
     referenceId: String!
     description: String
     source: String
+    malaysiaPDPAScannerFinding: MalaysiaPDPAScannerFinding
+        @goField(forceResolver: true)
     audits(
         first: Int
         after: CursorKey

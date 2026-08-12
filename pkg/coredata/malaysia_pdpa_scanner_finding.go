@@ -160,6 +160,37 @@ func (f *MalaysiaPDPAScannerFinding) LoadByID(
 	return nil
 }
 
+func (f *MalaysiaPDPAScannerFinding) LoadByFindingID(
+	ctx context.Context,
+	conn pg.Querier,
+	scope Scoper,
+	findingID gid.GID,
+) error {
+	q := `SELECT %s FROM malaysia_pdpa_scanner_findings WHERE %s AND finding_id = @finding_id LIMIT 1;`
+	q = fmt.Sprintf(q, malaysiaPDPAScannerFindingColumns, scope.SQLFragment())
+
+	args := pgx.StrictNamedArgs{"finding_id": findingID}
+	maps.Copy(args, scope.SQLArguments())
+
+	rows, err := conn.Query(ctx, q, args)
+	if err != nil {
+		return fmt.Errorf("cannot query Malaysia PDPA scanner finding by finding ID: %w", err)
+	}
+
+	finding, err := pgx.CollectExactlyOneRow(rows, pgx.RowToStructByName[MalaysiaPDPAScannerFinding])
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrResourceNotFound
+		}
+
+		return fmt.Errorf("cannot collect Malaysia PDPA scanner finding by finding ID: %w", err)
+	}
+
+	*f = finding
+
+	return nil
+}
+
 func (f *MalaysiaPDPAScannerFinding) LoadByIdentity(
 	ctx context.Context,
 	conn pg.Querier,
