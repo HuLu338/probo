@@ -81,33 +81,44 @@ func AssessDPIAScreening(input DPIAScreeningInput) (DPIAScreeningAssessment, err
 
 	if input.TotalDataSubjects > PersonalDataSubjectThreshold {
 		quantitative = true
+
 		reasons = append(reasons, DPIAScreeningReasonPersonalDataVolume)
 	}
+
 	if input.SensitiveDataSubjects > SensitiveDataSubjectThreshold {
 		quantitative = true
+
 		reasons = append(reasons, DPIAScreeningReasonSensitiveDataVolume)
 	}
+
 	if input.LegalOrSignificantEffects {
 		reasons = append(reasons, DPIAScreeningReasonLegalOrSignificantEffects)
 	}
+
 	if input.SystematicMonitoring {
 		reasons = append(reasons, DPIAScreeningReasonSystematicMonitoring)
 	}
+
 	if input.InnovativeTechnology {
 		reasons = append(reasons, DPIAScreeningReasonInnovativeTechnology)
 	}
+
 	if input.DenialOrRestrictionOfRights {
 		reasons = append(reasons, DPIAScreeningReasonRightsRestriction)
 	}
+
 	if input.LocationOrBehaviourTracking {
 		reasons = append(reasons, DPIAScreeningReasonLocationOrBehaviourTracking)
 	}
+
 	if input.ChildrenOrVulnerableDataSubjects {
 		reasons = append(reasons, DPIAScreeningReasonVulnerableDataSubjects)
 	}
+
 	if input.HighRiskAutomatedDecisionMaking {
 		reasons = append(reasons, DPIAScreeningReasonHighRiskAutomatedDecisions)
 	}
+
 	if input.OtherHighRiskFactors != nil && strings.TrimSpace(*input.OtherHighRiskFactors) != "" {
 		reasons = append(reasons, DPIAScreeningReasonOtherHighRiskFactors)
 	}

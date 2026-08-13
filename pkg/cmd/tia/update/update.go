@@ -131,10 +131,12 @@ func NewCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 				"malaysia-approval-notes",
 				"malaysia-review-evidence",
 			}
+
 			malaysiaChanged := false
 			for _, name := range malaysiaFlags {
 				malaysiaChanged = malaysiaChanged || cmd.Flags().Changed(name)
 			}
+
 			if malaysiaChanged {
 				required := map[string]string{
 					"malaysia-basis":                    flagMalaysiaBasis,

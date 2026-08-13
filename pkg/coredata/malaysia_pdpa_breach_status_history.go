@@ -62,6 +62,7 @@ func (h *MalaysiaPDPABreachStatusHistory) AuthorizationAttributes(
 	resourceIDs []gid.GID,
 ) (policy.AttributesByID, error) {
 	q := `SELECT id, organization_id FROM malaysia_pdpa_breach_status_history WHERE id = ANY(@resource_ids::text[])`
+
 	rows, err := conn.Query(ctx, q, pgx.StrictNamedArgs{"resource_ids": resourceIDs})
 	if err != nil {
 		return nil, fmt.Errorf("cannot query Malaysia PDPA breach history authorization attributes: %w", err)
@@ -69,11 +70,13 @@ func (h *MalaysiaPDPABreachStatusHistory) AuthorizationAttributes(
 	defer rows.Close()
 
 	attributes := make(policy.AttributesByID)
+
 	for rows.Next() {
 		var id, organizationID gid.GID
 		if err := rows.Scan(&id, &organizationID); err != nil {
 			return nil, fmt.Errorf("cannot scan Malaysia PDPA breach history authorization attributes: %w", err)
 		}
+
 		attributes[id] = policy.Attributes{"organization_id": organizationID.String()}
 	}
 

@@ -400,10 +400,12 @@ func (s *ProcessingActivityService) Update(
 				processingActivity.MalaysiaDPIAHighRiskAutomatedDecisionMaking = screening.HighRiskAutomatedDecisionMaking
 				processingActivity.MalaysiaDPIAOtherHighRiskFactors = screening.OtherHighRiskFactors
 				processingActivity.MalaysiaDPIARecommendation = assessment.Recommendation
+
 				processingActivity.MalaysiaDPIAReasons = make([]string, len(assessment.Reasons))
 				for index, reason := range assessment.Reasons {
 					processingActivity.MalaysiaDPIAReasons[index] = string(reason)
 				}
+
 				processingActivity.MalaysiaDPIAAssessedByProfileID = &screening.AssessedByProfileID
 				processingActivity.MalaysiaDPIAAssessedAt = &assessedAt
 				processingActivity.MalaysiaDPIARuleVersion = &ruleVersion

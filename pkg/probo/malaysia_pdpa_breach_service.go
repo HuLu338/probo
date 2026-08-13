@@ -221,7 +221,9 @@ func (s *MalaysiaPDPABreachService) CountByOrganizationID(
 
 	err := s.svc.pg.WithConn(ctx, func(ctx context.Context, conn pg.Querier) error {
 		incidents := &coredata.MalaysiaPDPABreachIncidents{}
+
 		var err error
+
 		count, err = incidents.CountByOrganizationID(ctx, conn, scope, organizationID)
 		if err != nil {
 			return fmt.Errorf("cannot count Malaysia PDPA breach incidents: %w", err)
@@ -381,6 +383,7 @@ func (s *MalaysiaPDPABreachService) Update(
 	}
 
 	incident := &coredata.MalaysiaPDPABreachIncident{}
+
 	err := s.svc.pg.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
 		if err := incident.LoadByID(ctx, tx, scope, req.ID); err != nil {
 			return fmt.Errorf("cannot load Malaysia PDPA breach incident: %w", err)
@@ -391,6 +394,7 @@ func (s *MalaysiaPDPABreachService) Update(
 		}
 
 		mergeMalaysiaPDPABreachUpdate(incident, req)
+
 		assessment, err := assessMalaysiaPDPABreach(
 			incident.AwarenessAt,
 			incident.AffectedDataSubjects,
@@ -441,6 +445,7 @@ func (s *MalaysiaPDPABreachService) TransitionStatus(
 	}
 
 	incident := &coredata.MalaysiaPDPABreachIncident{}
+
 	var history *coredata.MalaysiaPDPABreachStatusHistory
 
 	err := s.svc.pg.WithTx(ctx, func(ctx context.Context, tx pg.Tx) error {
@@ -516,7 +521,9 @@ func (s *MalaysiaPDPABreachService) CountStatusHistory(
 		}
 
 		history := &coredata.MalaysiaPDPABreachStatusHistories{}
+
 		var err error
+
 		count, err = history.CountByIncidentID(ctx, conn, scope, incidentID)
 		if err != nil {
 			return fmt.Errorf("cannot count Malaysia PDPA breach status history: %w", err)
@@ -562,84 +569,111 @@ func mergeMalaysiaPDPABreachUpdate(incident *coredata.MalaysiaPDPABreachIncident
 	if req.Title != nil {
 		incident.Title = *req.Title
 	}
+
 	if req.Description != nil {
 		incident.Description = *req.Description
 	}
+
 	if req.OccurredAt != nil {
 		incident.OccurredAt = *req.OccurredAt
 	}
+
 	if req.DiscoveredAt != nil {
 		incident.DiscoveredAt = *req.DiscoveredAt
 	}
+
 	if req.AwarenessAt != nil {
 		incident.AwarenessAt = *req.AwarenessAt
 	}
+
 	if req.AffectedDataSubjects != nil {
 		incident.AffectedDataSubjects = *req.AffectedDataSubjects
 	}
+
 	if req.AffectedDataRecords != nil {
 		incident.AffectedDataRecords = *req.AffectedDataRecords
 	}
+
 	if req.PersonalDataTypes != nil {
 		incident.PersonalDataTypes = *req.PersonalDataTypes
 	}
+
 	if req.AffectedSystem != nil {
 		incident.AffectedSystem = *req.AffectedSystem
 	}
+
 	if req.LikelyConsequences != nil {
 		incident.LikelyConsequences = *req.LikelyConsequences
 	}
+
 	if req.ContainmentActions != nil {
 		incident.ContainmentActions = *req.ContainmentActions
 	}
+
 	if req.PotentialPhysicalHarm != nil {
 		incident.PotentialPhysicalHarm = *req.PotentialPhysicalHarm
 	}
+
 	if req.PotentialFinancialLoss != nil {
 		incident.PotentialFinancialLoss = *req.PotentialFinancialLoss
 	}
+
 	if req.PotentialCreditOrPropertyDamage != nil {
 		incident.PotentialCreditOrPropertyDamage = *req.PotentialCreditOrPropertyDamage
 	}
+
 	if req.PotentialIllegalUse != nil {
 		incident.PotentialIllegalUse = *req.PotentialIllegalUse
 	}
+
 	if req.SensitivePersonalData != nil {
 		incident.SensitivePersonalData = *req.SensitivePersonalData
 	}
+
 	if req.PotentialIdentityFraud != nil {
 		incident.PotentialIdentityFraud = *req.PotentialIdentityFraud
 	}
+
 	if req.NotificationDecision != nil {
 		incident.NotificationDecision = *req.NotificationDecision
 	}
+
 	if req.DecisionRationale != nil {
 		incident.DecisionRationale = *req.DecisionRationale
 	}
+
 	if req.DecisionEvidence != nil {
 		incident.DecisionEvidence = *req.DecisionEvidence
 	}
+
 	if req.CommissionerNotifiedAt != nil {
 		incident.CommissionerNotifiedAt = *req.CommissionerNotifiedAt
 	}
+
 	if req.CommissionerNotificationReference != nil {
 		incident.CommissionerNotificationReference = *req.CommissionerNotificationReference
 	}
+
 	if req.CommissionerConfirmationReceivedAt != nil {
 		incident.CommissionerConfirmationReceivedAt = *req.CommissionerConfirmationReceivedAt
 	}
+
 	if req.CommissionerConfirmationReference != nil {
 		incident.CommissionerConfirmationReference = *req.CommissionerConfirmationReference
 	}
+
 	if req.DelayedNotificationReason != nil {
 		incident.DelayedNotificationReason = *req.DelayedNotificationReason
 	}
+
 	if req.DelayedNotificationEvidence != nil {
 		incident.DelayedNotificationEvidence = *req.DelayedNotificationEvidence
 	}
+
 	if req.DataSubjectsNotifiedAt != nil {
 		incident.DataSubjectsNotifiedAt = *req.DataSubjectsNotifiedAt
 	}
+
 	if req.DataSubjectsNotificationEvidence != nil {
 		incident.DataSubjectsNotificationEvidence = *req.DataSubjectsNotificationEvidence
 	}
@@ -677,6 +711,7 @@ func applyMalaysiaPDPABreachAssessment(incident *coredata.MalaysiaPDPABreachInci
 	incident.SignificantHarm = assessment.SignificantHarm
 	incident.SignificantScale = assessment.SignificantScale
 	incident.NotificationRecommendation = coredata.MalaysiaPDPABreachNotificationDecision(assessment.Recommendation)
+
 	incident.NotificationReasons = make([]string, len(assessment.Reasons))
 	for index, reason := range assessment.Reasons {
 		incident.NotificationReasons[index] = string(reason)
@@ -727,6 +762,7 @@ func validateMalaysiaPDPABreachIncident(incident *coredata.MalaysiaPDPABreachInc
 		if isBlank(incident.DelayedNotificationReason) {
 			addMalaysiaPDPABreachValidationError(v, incident.DelayedNotificationReason, "delayed_notification_reason", "is required for a notification submitted after 72 hours")
 		}
+
 		if isBlank(incident.DelayedNotificationEvidence) {
 			addMalaysiaPDPABreachValidationError(v, incident.DelayedNotificationEvidence, "delayed_notification_evidence", "is required for a notification submitted after 72 hours")
 		}
@@ -750,47 +786,59 @@ func validateMalaysiaPDPABreachTimeline(
 	if discoveredAt.IsZero() {
 		addMalaysiaPDPABreachValidationError(v, discoveredAt, "discovered_at", "is required")
 	}
+
 	if awarenessAt.IsZero() {
 		addMalaysiaPDPABreachValidationError(v, awarenessAt, "awareness_at", "is required")
 	}
+
 	if occurredAt != nil && !discoveredAt.IsZero() && occurredAt.After(discoveredAt) {
 		addMalaysiaPDPABreachValidationError(v, occurredAt, "occurred_at", "must not be after discovered_at")
 	}
+
 	if !discoveredAt.IsZero() && !awarenessAt.IsZero() && discoveredAt.After(awarenessAt) {
 		addMalaysiaPDPABreachValidationError(v, awarenessAt, "awareness_at", "must not be before discovered_at")
 	}
+
 	if commissionerNotifiedAt != nil && !awarenessAt.IsZero() && commissionerNotifiedAt.Before(awarenessAt) {
 		addMalaysiaPDPABreachValidationError(v, commissionerNotifiedAt, "commissioner_notified_at", "must not be before awareness_at")
 	}
+
 	if commissionerNotifiedAt != nil && isBlank(commissionerNotificationReference) {
 		addMalaysiaPDPABreachValidationError(v, commissionerNotificationReference, "commissioner_notification_reference", "is required when commissioner_notified_at is recorded")
 	}
+
 	if commissionerNotificationReference != nil && commissionerNotifiedAt == nil {
 		addMalaysiaPDPABreachValidationError(v, commissionerNotificationReference, "commissioner_notification_reference", "requires commissioner_notified_at")
 	}
+
 	if commissionerConfirmationReceivedAt != nil {
 		if commissionerNotifiedAt == nil {
 			addMalaysiaPDPABreachValidationError(v, commissionerConfirmationReceivedAt, "commissioner_confirmation_received_at", "requires commissioner_notified_at")
 		} else if commissionerConfirmationReceivedAt.Before(*commissionerNotifiedAt) {
 			addMalaysiaPDPABreachValidationError(v, commissionerConfirmationReceivedAt, "commissioner_confirmation_received_at", "must not be before commissioner_notified_at")
 		}
+
 		if isBlank(commissionerConfirmationReference) {
 			addMalaysiaPDPABreachValidationError(v, commissionerConfirmationReference, "commissioner_confirmation_reference", "is required when commissioner_confirmation_received_at is recorded")
 		}
 	}
+
 	if commissionerConfirmationReference != nil && commissionerConfirmationReceivedAt == nil {
 		addMalaysiaPDPABreachValidationError(v, commissionerConfirmationReference, "commissioner_confirmation_reference", "requires commissioner_confirmation_received_at")
 	}
+
 	if dataSubjectsNotifiedAt != nil {
 		if commissionerNotifiedAt == nil {
 			addMalaysiaPDPABreachValidationError(v, dataSubjectsNotifiedAt, "data_subjects_notified_at", "requires commissioner_notified_at")
 		} else if dataSubjectsNotifiedAt.Before(*commissionerNotifiedAt) {
 			addMalaysiaPDPABreachValidationError(v, dataSubjectsNotifiedAt, "data_subjects_notified_at", "must not be before commissioner_notified_at")
 		}
+
 		if isBlank(dataSubjectsNotificationEvidence) {
 			addMalaysiaPDPABreachValidationError(v, dataSubjectsNotificationEvidence, "data_subjects_notification_evidence", "is required when data_subjects_notified_at is recorded")
 		}
 	}
+
 	if dataSubjectsNotificationEvidence != nil && dataSubjectsNotifiedAt == nil {
 		addMalaysiaPDPABreachValidationError(v, dataSubjectsNotificationEvidence, "data_subjects_notification_evidence", "requires data_subjects_notified_at")
 	}

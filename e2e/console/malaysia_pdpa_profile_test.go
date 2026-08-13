@@ -232,6 +232,7 @@ func TestMalaysiaPDPAProfile_CommissionerNotificationOverdue(t *testing.T) {
 				t.Parallel()
 
 				owner := testutil.NewClient(t, testutil.RoleOwner)
+
 				input := map[string]any{
 					"organizationId":              owner.GetOrganizationID().String(),
 					"totalDataSubjects":           0,

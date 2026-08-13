@@ -83,6 +83,7 @@ func (r *IngestMalaysiaPDPAScannerFindingRequest) Validate() error {
 	}
 
 	field := "evidence"
+
 	switch {
 	case errors.Is(err, malaysiapdpa.ErrScannerFindingExternalIDRequired):
 		field = "external_id"
@@ -175,6 +176,7 @@ func (s *MalaysiaPDPAScannerFindingService) get(
 	if err != nil {
 		return nil, err
 	}
+
 	result.Evidence = evidence
 
 	return result, nil
@@ -243,6 +245,7 @@ func (s *MalaysiaPDPAScannerFindingService) Ingest(
 		}
 
 		existing := &coredata.MalaysiaPDPAScannerFinding{}
+
 		err := existing.LoadByIdentity(
 			ctx,
 			tx,
@@ -261,8 +264,10 @@ func (s *MalaysiaPDPAScannerFindingService) Ingest(
 			}
 
 			created = true
+
 			return nil
 		}
+
 		if err != nil {
 			return fmt.Errorf("cannot load existing Malaysia PDPA scanner finding: %w", err)
 		}
@@ -275,6 +280,7 @@ func (s *MalaysiaPDPAScannerFindingService) Ingest(
 		if err := finding.LoadByID(ctx, tx, scope, existing.FindingID); err != nil {
 			return fmt.Errorf("cannot load associated finding: %w", err)
 		}
+
 		if finding.OrganizationID != req.OrganizationID {
 			return fmt.Errorf("associated finding belongs to another organization")
 		}

@@ -126,10 +126,12 @@ func NewCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 				"malaysia-high-risk-automated-decision-making",
 				"malaysia-other-high-risk-factors",
 			}
+
 			malaysiaChanged := false
 			for _, name := range malaysiaFlags {
 				malaysiaChanged = malaysiaChanged || cmd.Flags().Changed(name)
 			}
+
 			if malaysiaChanged {
 				if !cmd.Flags().Changed("malaysia-total-data-subjects") || !cmd.Flags().Changed("malaysia-sensitive-data-subjects") {
 					return fmt.Errorf("--malaysia-total-data-subjects and --malaysia-sensitive-data-subjects are required for a Malaysia DPIA screening")

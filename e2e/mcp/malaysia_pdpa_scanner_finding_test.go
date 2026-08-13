@@ -100,6 +100,7 @@ func TestMCP_MalaysiaPDPAScannerFinding_PrivacyScopeEnforcement(t *testing.T) {
 
 	writeToken := owner.CreateOAuth2AccessToken("e2e-scanner-privacy-write", []string{"v1:privacy"})
 	writeClient := testutil.NewMCPClientWithAccessToken(t, owner, writeToken)
+
 	var result struct {
 		Created bool `json:"created"`
 	}

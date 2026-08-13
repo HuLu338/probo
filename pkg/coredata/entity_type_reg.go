@@ -147,6 +147,7 @@ const (
 	MalaysiaPDPABreachIncidentEntityType             uint16 = 115
 	MalaysiaPDPABreachStatusHistoryEntityType        uint16 = 116
 	MalaysiaPDPAScannerFindingEntityType             uint16 = 117
+	AiSystemEntityType                               uint16 = 118
 )
 
 func NewEntityFromID(id gid.GID) (any, bool) {
@@ -369,6 +370,8 @@ func NewEntityFromID(id gid.GID) (any, bool) {
 		return &MalaysiaPDPABreachStatusHistory{ID: id}, true
 	case MalaysiaPDPAScannerFindingEntityType:
 		return &MalaysiaPDPAScannerFinding{ID: id}, true
+	case AiSystemEntityType:
+		return &AiSystem{ID: id}, true
 	default:
 		return nil, false
 	}

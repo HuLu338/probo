@@ -46,6 +46,7 @@ func (r *mutationResolver) IngestMalaysiaPDPAScannerFinding(ctx context.Context,
 		}
 
 		r.logger.ErrorCtx(ctx, "cannot ingest Malaysia PDPA scanner finding", log.Error(err))
+
 		return nil, gqlutils.Internal(ctx)
 	}
 

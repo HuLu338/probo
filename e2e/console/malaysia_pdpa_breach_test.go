@@ -196,6 +196,7 @@ func TestMalaysiaPDPABreach_StatusHistoryIsAppended(t *testing.T) {
 			} `json:"historyEdge"`
 		} `json:"transitionMalaysiaPDPABreachStatus"`
 	}
+
 	err := owner.Execute(transitionMalaysiaPDPABreachMutation, map[string]any{
 		"input": map[string]any{
 			"id":       incident.ID,
@@ -218,6 +219,7 @@ func TestMalaysiaPDPABreach_StatusHistoryIsAppended(t *testing.T) {
 			} `json:"statusHistory"`
 		} `json:"node"`
 	}
+
 	err = owner.Execute(malaysiaPDPABreachHistoryQuery, map[string]any{"id": incident.ID}, &historyResult)
 	require.NoError(t, err)
 	require.NotNil(t, historyResult.Node)
@@ -280,6 +282,7 @@ func TestMalaysiaPDPABreach_RBACAndTenantIsolation(t *testing.T) {
 			} `json:"malaysiaPDPABreachIncidents"`
 		} `json:"node"`
 	}
+
 	err := viewer.Execute(listMalaysiaPDPABreachQuery, map[string]any{"id": owner.GetOrganizationID().String()}, &viewerList)
 	require.NoError(t, err)
 	require.NotNil(t, viewerList.Node)
@@ -296,6 +299,7 @@ func TestMalaysiaPDPABreach_RBACAndTenantIsolation(t *testing.T) {
 	var inaccessible struct {
 		Node *malaysiaPDPABreachResult `json:"node"`
 	}
+
 	err = otherOwner.Execute(`query($id: ID!) { node(id: $id) { ... on MalaysiaPDPABreachIncident { id } } }`, map[string]any{"id": incident.ID}, &inaccessible)
 	testutil.AssertNodeNotAccessible(t, err, inaccessible.Node == nil, "Malaysia PDPA breach incident")
 }
@@ -306,6 +310,7 @@ func TestMalaysiaPDPABreach_LateNotificationRequiresReasonAndEvidence(t *testing
 	input := baseMalaysiaPDPABreachInput(owner, "Late notification")
 	awarenessAt, err := time.Parse(time.RFC3339, input["awarenessAt"].(string))
 	require.NoError(t, err)
+
 	input["affectedDataSubjects"] = 1_001
 	input["notificationDecision"] = "COMMISSIONER_ONLY"
 	input["decisionRationale"] = "Significant scale requires Commissioner notification."
@@ -323,6 +328,7 @@ func TestMalaysiaPDPABreach_LateNotificationRequiresReasonAndEvidence(t *testing
 			errorFields = append(errorFields, field)
 		}
 	}
+
 	assert.ElementsMatch(t, []string{
 		"delayed_notification_reason",
 		"delayed_notification_evidence",
@@ -331,6 +337,7 @@ func TestMalaysiaPDPABreach_LateNotificationRequiresReasonAndEvidence(t *testing
 
 func createMalaysiaPDPABreach(t *testing.T, client *testutil.Client, input map[string]any) malaysiaPDPABreachResult {
 	t.Helper()
+
 	var result struct {
 		Create struct {
 			IncidentEdge struct {
@@ -338,13 +345,16 @@ func createMalaysiaPDPABreach(t *testing.T, client *testutil.Client, input map[s
 			} `json:"incidentEdge"`
 		} `json:"createMalaysiaPDPABreachIncident"`
 	}
+
 	err := client.Execute(createMalaysiaPDPABreachMutation, map[string]any{"input": input}, &result)
 	require.NoError(t, err)
+
 	return result.Create.IncidentEdge.Node
 }
 
 func baseMalaysiaPDPABreachInput(client *testutil.Client, title string) map[string]any {
 	awarenessAt := time.Now().UTC().Truncate(time.Second)
+
 	return map[string]any{
 		"organizationId":                  client.GetOrganizationID().String(),
 		"title":                           title,

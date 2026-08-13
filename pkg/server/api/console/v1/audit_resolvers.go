@@ -281,6 +281,7 @@ func (r *findingResolver) MalaysiaPDPAScannerFinding(ctx context.Context, obj *t
 		}
 
 		r.logger.ErrorCtx(ctx, "cannot get Malaysia PDPA scanner finding for finding", log.Error(err))
+
 		return nil, gqlutils.Internal(ctx)
 	}
 

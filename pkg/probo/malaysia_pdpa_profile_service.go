@@ -149,6 +149,7 @@ func (s OrganizationService) GetMalaysiaPDPAProfile(
 
 				return nil
 			}
+
 			if err != nil {
 				return fmt.Errorf("cannot load Malaysia PDPA profile: %w", err)
 			}
@@ -236,6 +237,7 @@ func (s OrganizationService) UpdateMalaysiaPDPAProfile(
 			}
 
 			existing := &coredata.MalaysiaPDPAProfile{}
+
 			err := existing.LoadByOrganizationID(ctx, tx, scope, req.OrganizationID)
 			if err == nil {
 				profile.CreatedAt = existing.CreatedAt

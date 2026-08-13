@@ -43,9 +43,11 @@ func TestNewCmdUpdate_RequestsDPOAssessmentProvenance(t *testing.T) {
 			Query string `json:"query"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
+
 		queries <- request.Query
 
 		w.Header().Set("Content-Type", "application/json")
+
 		if strings.Contains(request.Query, "query($id: ID!)") {
 			_, _ = w.Write([]byte(`{"data":{"node":{"malaysiaPDPAProfile":{}}}}`))
 			return

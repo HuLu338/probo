@@ -200,27 +200,33 @@ func TestMalaysiaPDPATransfer_ValidationAndRBAC(t *testing.T) {
 
 func updateMalaysiaPDPADPIAScreening(t *testing.T, client *testutil.Client, processingActivityID string, screening map[string]any) malaysiaPDPADPIAScreeningResult {
 	t.Helper()
+
 	var result struct {
 		Update struct {
 			ProcessingActivity malaysiaPDPADPIAScreeningResult `json:"processingActivity"`
 		} `json:"updateProcessingActivity"`
 	}
+
 	err := client.Execute(updateMalaysiaPDPADPIAScreeningMutation, map[string]any{"input": map[string]any{
 		"id": processingActivityID, "malaysiaPDPADPIAScreening": screening,
 	}}, &result)
 	require.NoError(t, err)
+
 	return result.Update.ProcessingActivity
 }
 
 func createMalaysiaPDPATransfer(t *testing.T, client *testutil.Client, processingActivityID, recipientID, status, evidence string) malaysiaPDPATransferResult {
 	t.Helper()
+
 	var result struct {
 		Create struct {
 			TransferImpactAssessment malaysiaPDPATransferResult `json:"transferImpactAssessment"`
 		} `json:"createTransferImpactAssessment"`
 	}
+
 	err := client.Execute(createMalaysiaPDPATransferMutation, map[string]any{"input": malaysiaPDPATransferInput(processingActivityID, recipientID, "SG", status, evidence)}, &result)
 	require.NoError(t, err)
+
 	return result.Create.TransferImpactAssessment
 }
 

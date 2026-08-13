@@ -34,6 +34,7 @@ import (
 
 func (r *Resolver) malaysiaPDPABreachActor(ctx context.Context, organizationID gid.GID) (*coredata.MembershipProfile, error) {
 	identity := authn.IdentityFromContext(ctx)
+
 	actor, err := r.iam.OrganizationService.GetProfileForIdentityAndOrganization(ctx, identity.ID, organizationID)
 	if err != nil {
 		r.logger.ErrorCtx(ctx, "cannot load Malaysia PDPA breach actor profile", log.Error(err))
@@ -49,5 +50,6 @@ func (r *Resolver) malaysiaPDPABreachMutationError(ctx context.Context, message 
 	}
 
 	r.logger.ErrorCtx(ctx, message, log.Error(err))
+
 	return gqlutils.Internal(ctx)
 }

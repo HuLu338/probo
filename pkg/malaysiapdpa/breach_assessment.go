@@ -98,26 +98,37 @@ func AssessBreachNotification(input BreachAssessmentInput) (BreachAssessment, er
 
 	if input.PotentialPhysicalHarm {
 		significantHarm = true
+
 		reasons = append(reasons, BreachNotificationReasonPhysicalHarm)
 	}
+
 	if input.PotentialFinancialLoss {
 		significantHarm = true
+
 		reasons = append(reasons, BreachNotificationReasonFinancialLoss)
 	}
+
 	if input.PotentialCreditOrPropertyDamage {
 		significantHarm = true
+
 		reasons = append(reasons, BreachNotificationReasonCreditOrPropertyDamage)
 	}
+
 	if input.PotentialIllegalUse {
 		significantHarm = true
+
 		reasons = append(reasons, BreachNotificationReasonIllegalUse)
 	}
+
 	if input.SensitivePersonalData {
 		significantHarm = true
+
 		reasons = append(reasons, BreachNotificationReasonSensitivePersonalData)
 	}
+
 	if input.PotentialIdentityFraud {
 		significantHarm = true
+
 		reasons = append(reasons, BreachNotificationReasonIdentityFraud)
 	}
 

@@ -51,6 +51,10 @@ export async function execute(
 					id
 					name
 					description
+					period {
+						start
+						end
+					}
 					createdAt
 					updatedAt
 				}

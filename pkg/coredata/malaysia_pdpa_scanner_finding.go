@@ -113,6 +113,7 @@ func (f *MalaysiaPDPAScannerFinding) AuthorizationAttributes(
 	defer rows.Close()
 
 	attributes := make(policy.AttributesByID)
+
 	for rows.Next() {
 		var id, organizationID gid.GID
 		if err := rows.Scan(&id, &organizationID); err != nil {

@@ -159,6 +159,7 @@ func (i *MalaysiaPDPABreachIncident) AuthorizationAttributes(
 	defer rows.Close()
 
 	attributes := make(policy.AttributesByID)
+
 	for rows.Next() {
 		var id, organizationID gid.GID
 		if err := rows.Scan(&id, &organizationID); err != nil {
@@ -344,6 +345,7 @@ WHERE %s AND id = @id;`
 	if err != nil {
 		return fmt.Errorf("cannot update Malaysia PDPA breach incident: %w", err)
 	}
+
 	if result.RowsAffected() == 0 {
 		return ErrResourceNotFound
 	}
@@ -366,6 +368,7 @@ func (i *MalaysiaPDPABreachIncident) UpdateStatus(ctx context.Context, conn pg.T
 	if err != nil {
 		return fmt.Errorf("cannot update Malaysia PDPA breach status: %w", err)
 	}
+
 	if result.RowsAffected() == 0 {
 		return ErrResourceNotFound
 	}

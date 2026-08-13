@@ -123,6 +123,7 @@ func NewListMalaysiaPDPABreachIncidentsOutput(
 	}
 
 	var nextCursor *page.CursorKey
+
 	if len(p.Data) > 0 {
 		key := p.Data[len(p.Data)-1].CursorKey(p.Cursor.OrderBy.Field)
 		nextCursor = &key
@@ -143,6 +144,7 @@ func NewListMalaysiaPDPABreachStatusHistoryOutput(
 	}
 
 	var nextCursor *page.CursorKey
+
 	if len(p.Data) > 0 {
 		key := p.Data[len(p.Data)-1].CursorKey(p.Cursor.OrderBy.Field)
 		nextCursor = &key

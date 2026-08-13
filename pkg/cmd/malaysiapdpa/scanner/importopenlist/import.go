@@ -124,6 +124,7 @@ func newCmdImportOpenList(
 			if scannerURL == "" {
 				scannerURL = strings.TrimSpace(getenv("OPENLIST_SCANNER_URL"))
 			}
+
 			if scannerURL == "" {
 				return fmt.Errorf("OpenList scanner URL is required: pass --scanner-url or set OPENLIST_SCANNER_URL")
 			}
@@ -147,6 +148,7 @@ func newCmdImportOpenList(
 			if organizationID == "" {
 				organizationID = hc.Organization
 			}
+
 			if organizationID == "" {
 				return fmt.Errorf("organization ID is required: pass --org or run `prb auth login`")
 			}
@@ -227,6 +229,7 @@ func newCmdImportOpenList(
 					},
 				)
 			}
+
 			result.Imported = len(result.Findings)
 
 			if *flagOutput == cmdutil.OutputJSON {
