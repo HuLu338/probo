@@ -60,6 +60,7 @@ export async function execute(
 						dpoProfileId
 						dpoAppointedAt
 						commissionerNotificationDueAt
+						commissionerNotificationOverdue
 						commissionerNotifiedAt
 						commissionerNotificationReference
 						createdAt
