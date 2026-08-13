@@ -218,6 +218,7 @@ func TestScannerCheckKeys_MVPChecks(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, malaysiapdpa.ScannerCheckKeys())
+
 	for _, checkKey := range expected {
 		assert.True(t, checkKey.IsValid())
 	}

@@ -258,9 +258,11 @@ func newClient(f *cmdutil.Factory) (*api.Client, string, error) {
 }
 
 func newCmdList(f *cmdutil.Factory) *cobra.Command {
-	var organizationID string
-	var limit int
-	var output *string
+	var (
+		organizationID string
+		limit          int
+		output         *string
+	)
 
 	cmd := &cobra.Command{
 		Use:     "list",
@@ -271,6 +273,7 @@ func newCmdList(f *cmdutil.Factory) *cobra.Command {
 			if err := cmdutil.ValidateOutputFlag(output); err != nil {
 				return err
 			}
+
 			if err := cmdutil.ValidateLimit(limit); err != nil {
 				return err
 			}
@@ -279,9 +282,11 @@ func newCmdList(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			if organizationID == "" {
 				organizationID = defaultOrganizationID
 			}
+
 			if organizationID == "" {
 				return fmt.Errorf("organization ID is required: pass --org or run `prb auth login`")
 			}
@@ -295,9 +300,11 @@ func newCmdList(f *cmdutil.Factory) *cobra.Command {
 				if err := json.Unmarshal(data, &response); err != nil {
 					return nil, err
 				}
+
 				if response.Node == nil {
 					return nil, fmt.Errorf("organization %s not found", organizationID)
 				}
+
 				return &response.Node.Incidents, nil
 			})
 			if err != nil {
@@ -307,6 +314,7 @@ func newCmdList(f *cmdutil.Factory) *cobra.Command {
 			if *output == cmdutil.OutputJSON {
 				return cmdutil.PrintJSON(f.IOStreams.Out, incidents)
 			}
+
 			if len(incidents) == 0 {
 				_, _ = fmt.Fprintln(f.IOStreams.Out, "No Malaysia PDPA breach incidents found.")
 				return nil
@@ -322,9 +330,11 @@ func newCmdList(f *cmdutil.Factory) *cobra.Command {
 					cmdutil.FormatTime(current.AwarenessAt),
 				}
 			}
+
 			table := cmdutil.NewTable("ID", "TITLE", "STATUS", "RECOMMENDATION", "AWARENESS AT").Rows(rows...)
 			_, _ = fmt.Fprintln(f.IOStreams.Out, table)
 			_, _ = fmt.Fprintf(f.IOStreams.Out, "\nShowing %d of %d incident(s).\n", len(incidents), totalCount)
+
 			return nil
 		},
 	}
@@ -332,11 +342,13 @@ func newCmdList(f *cmdutil.Factory) *cobra.Command {
 	cmd.Flags().StringVar(&organizationID, "org", "", "Organization ID")
 	cmd.Flags().IntVar(&limit, "limit", 100, "Maximum number of incidents to return")
 	output = cmdutil.AddOutputFlag(cmd)
+
 	return cmd
 }
 
 func newCmdView(f *cmdutil.Factory) *cobra.Command {
 	var output *string
+
 	cmd := &cobra.Command{
 		Use:   "view <incident-id>",
 		Short: "View a Malaysia PDPA breach incident",
@@ -345,36 +357,45 @@ func newCmdView(f *cmdutil.Factory) *cobra.Command {
 			if err := cmdutil.ValidateOutputFlag(output); err != nil {
 				return err
 			}
+
 			client, _, err := newClient(f)
 			if err != nil {
 				return err
 			}
+
 			data, err := client.Do(viewQuery, map[string]any{"id": args[0]})
 			if err != nil {
 				return err
 			}
+
 			var response struct {
 				Node *incident `json:"node"`
 			}
 			if err := json.Unmarshal(data, &response); err != nil {
 				return fmt.Errorf("cannot parse response: %w", err)
 			}
+
 			if response.Node == nil {
 				return fmt.Errorf("incident %s not found", args[0])
 			}
+
 			if *output == cmdutil.OutputJSON {
 				return cmdutil.PrintJSON(f.IOStreams.Out, response.Node)
 			}
+
 			return renderIncident(f, response.Node)
 		},
 	}
 	output = cmdutil.AddOutputFlag(cmd)
+
 	return cmd
 }
 
 func newCmdCreate(f *cmdutil.Factory) *cobra.Command {
 	flags := &createFlags{}
+
 	var output *string
+
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Record and assess a Malaysia PDPA breach incident",
@@ -383,6 +404,7 @@ func newCmdCreate(f *cmdutil.Factory) *cobra.Command {
 			if err := cmdutil.ValidateOutputFlag(output); err != nil {
 				return err
 			}
+
 			if err := cmdutil.ValidateEnum("notification-decision", flags.notificationDecision, []string{"PENDING", "NOT_REQUIRED", "COMMISSIONER_ONLY", "COMMISSIONER_AND_DATA_SUBJECTS"}); err != nil {
 				return err
 			}
@@ -391,9 +413,11 @@ func newCmdCreate(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			if flags.organizationID == "" {
 				flags.organizationID = defaultOrganizationID
 			}
+
 			if flags.organizationID == "" {
 				return fmt.Errorf("organization ID is required: pass --org or run `prb auth login`")
 			}
@@ -402,6 +426,7 @@ func newCmdCreate(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			awarenessAt, err := parseRFC3339("awareness-at", flags.awarenessAt)
 			if err != nil {
 				return err
@@ -429,11 +454,13 @@ func newCmdCreate(f *cmdutil.Factory) *cobra.Command {
 			setOptionalString(input, "containmentActions", flags.containmentActions)
 			setOptionalString(input, "decisionRationale", flags.decisionRationale)
 			setOptionalString(input, "decisionEvidence", flags.decisionEvidence)
+
 			if flags.occurredAt != "" {
 				occurredAt, err := parseRFC3339("occurred-at", flags.occurredAt)
 				if err != nil {
 					return err
 				}
+
 				input["occurredAt"] = occurredAt
 			}
 
@@ -441,6 +468,7 @@ func newCmdCreate(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			var response struct {
 				Create struct {
 					IncidentEdge struct {
@@ -451,34 +479,39 @@ func newCmdCreate(f *cmdutil.Factory) *cobra.Command {
 			if err := json.Unmarshal(data, &response); err != nil {
 				return fmt.Errorf("cannot parse response: %w", err)
 			}
+
 			if *output == cmdutil.OutputJSON {
 				return cmdutil.PrintJSON(f.IOStreams.Out, response.Create.IncidentEdge.Node)
 			}
+
 			return renderIncident(f, response.Create.IncidentEdge.Node)
 		},
 	}
 
 	addCreateFlags(cmd, flags)
 	output = cmdutil.AddOutputFlag(cmd)
+
 	return cmd
 }
 
 func newCmdUpdate(f *cmdutil.Factory) *cobra.Command {
-	var notificationDecision string
-	var decisionRationale string
-	var decisionEvidence string
-	var commissionerNotifiedAt string
-	var commissionerNotificationReference string
-	var commissionerConfirmationReceivedAt string
-	var commissionerConfirmationReference string
-	var delayedNotificationReason string
-	var delayedNotificationEvidence string
-	var dataSubjectsNotifiedAt string
-	var dataSubjectsNotificationEvidence string
-	var clearCommissionerNotification bool
-	var clearCommissionerConfirmation bool
-	var clearDataSubjectsNotification bool
-	var output *string
+	var (
+		notificationDecision               string
+		decisionRationale                  string
+		decisionEvidence                   string
+		commissionerNotifiedAt             string
+		commissionerNotificationReference  string
+		commissionerConfirmationReceivedAt string
+		commissionerConfirmationReference  string
+		delayedNotificationReason          string
+		delayedNotificationEvidence        string
+		dataSubjectsNotifiedAt             string
+		dataSubjectsNotificationEvidence   string
+		clearCommissionerNotification      bool
+		clearCommissionerConfirmation      bool
+		clearDataSubjectsNotification      bool
+		output                             *string
+	)
 
 	cmd := &cobra.Command{
 		Use:   "update <incident-id>",
@@ -488,13 +521,17 @@ func newCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 			if err := cmdutil.ValidateOutputFlag(output); err != nil {
 				return err
 			}
+
 			input := map[string]any{"id": args[0]}
+
 			if cmd.Flags().Changed("notification-decision") {
 				if err := cmdutil.ValidateEnum("notification-decision", notificationDecision, []string{"PENDING", "NOT_REQUIRED", "COMMISSIONER_ONLY", "COMMISSIONER_AND_DATA_SUBJECTS"}); err != nil {
 					return err
 				}
+
 				input["notificationDecision"] = notificationDecision
 			}
+
 			copyChangedString(cmd, input, "decision-rationale", "decisionRationale", decisionRationale)
 			copyChangedString(cmd, input, "decision-evidence", "decisionEvidence", decisionEvidence)
 			copyChangedString(cmd, input, "commissioner-notification-reference", "commissionerNotificationReference", commissionerNotificationReference)
@@ -513,6 +550,7 @@ func newCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 					if err != nil {
 						return err
 					}
+
 					input[candidate.inputName] = parsed
 				}
 			}
@@ -521,14 +559,17 @@ func newCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 				input["commissionerNotifiedAt"] = nil
 				input["commissionerNotificationReference"] = nil
 			}
+
 			if clearCommissionerConfirmation {
 				input["commissionerConfirmationReceivedAt"] = nil
 				input["commissionerConfirmationReference"] = nil
 			}
+
 			if clearDataSubjectsNotification {
 				input["dataSubjectsNotifiedAt"] = nil
 				input["dataSubjectsNotificationEvidence"] = nil
 			}
+
 			if len(input) == 1 {
 				return fmt.Errorf("at least one update flag is required")
 			}
@@ -537,10 +578,12 @@ func newCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			data, err := client.Do(updateMutation, map[string]any{"input": input})
 			if err != nil {
 				return err
 			}
+
 			var response struct {
 				Update struct {
 					Incident *incident `json:"incident"`
@@ -549,9 +592,11 @@ func newCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 			if err := json.Unmarshal(data, &response); err != nil {
 				return fmt.Errorf("cannot parse response: %w", err)
 			}
+
 			if *output == cmdutil.OutputJSON {
 				return cmdutil.PrintJSON(f.IOStreams.Out, response.Update.Incident)
 			}
+
 			return renderIncident(f, response.Update.Incident)
 		},
 	}
@@ -574,13 +619,17 @@ func newCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 	cmd.MarkFlagsMutuallyExclusive("commissioner-confirmation-received-at", "clear-commissioner-confirmation")
 	cmd.MarkFlagsMutuallyExclusive("data-subjects-notified-at", "clear-data-subjects-notification")
 	output = cmdutil.AddOutputFlag(cmd)
+
 	return cmd
 }
 
 func newCmdTransition(f *cmdutil.Factory) *cobra.Command {
-	var toStatus string
-	var reason string
-	var output *string
+	var (
+		toStatus string
+		reason   string
+		output   *string
+	)
+
 	cmd := &cobra.Command{
 		Use:   "transition <incident-id>",
 		Short: "Move a breach incident to an allowed status",
@@ -589,19 +638,24 @@ func newCmdTransition(f *cmdutil.Factory) *cobra.Command {
 			if err := cmdutil.ValidateOutputFlag(output); err != nil {
 				return err
 			}
+
 			if err := cmdutil.ValidateEnum("to", toStatus, []string{"OPEN", "ASSESSING", "CONTAINED", "CLOSED"}); err != nil {
 				return err
 			}
+
 			input := map[string]any{"id": args[0], "toStatus": toStatus}
 			setOptionalString(input, "reason", reason)
+
 			client, _, err := newClient(f)
 			if err != nil {
 				return err
 			}
+
 			data, err := client.Do(transitionMutation, map[string]any{"input": input})
 			if err != nil {
 				return err
 			}
+
 			var response struct {
 				Transition struct {
 					Incident    *incident `json:"incident"`
@@ -613,9 +667,11 @@ func newCmdTransition(f *cmdutil.Factory) *cobra.Command {
 			if err := json.Unmarshal(data, &response); err != nil {
 				return fmt.Errorf("cannot parse response: %w", err)
 			}
+
 			if *output == cmdutil.OutputJSON {
 				return cmdutil.PrintJSON(f.IOStreams.Out, response.Transition)
 			}
+
 			return renderIncident(f, response.Transition.Incident)
 		},
 	}
@@ -623,12 +679,16 @@ func newCmdTransition(f *cmdutil.Factory) *cobra.Command {
 	cmd.Flags().StringVar(&reason, "reason", "", "Reason for the status change")
 	_ = cmd.MarkFlagRequired("to")
 	output = cmdutil.AddOutputFlag(cmd)
+
 	return cmd
 }
 
 func newCmdHistory(f *cmdutil.Factory) *cobra.Command {
-	var limit int
-	var output *string
+	var (
+		limit  int
+		output *string
+	)
+
 	cmd := &cobra.Command{
 		Use:   "history <incident-id>",
 		Short: "List immutable breach status history",
@@ -637,13 +697,16 @@ func newCmdHistory(f *cmdutil.Factory) *cobra.Command {
 			if err := cmdutil.ValidateOutputFlag(output); err != nil {
 				return err
 			}
+
 			if err := cmdutil.ValidateLimit(limit); err != nil {
 				return err
 			}
+
 			client, _, err := newClient(f)
 			if err != nil {
 				return err
 			}
+
 			history, _, err := api.Paginate(client, historyQuery, map[string]any{"id": args[0]}, limit, func(data json.RawMessage) (*api.Connection[statusHistory], error) {
 				var response struct {
 					Node *struct {
@@ -653,36 +716,45 @@ func newCmdHistory(f *cmdutil.Factory) *cobra.Command {
 				if err := json.Unmarshal(data, &response); err != nil {
 					return nil, err
 				}
+
 				if response.Node == nil {
 					return nil, fmt.Errorf("incident %s not found", args[0])
 				}
+
 				return &response.Node.History, nil
 			})
 			if err != nil {
 				return err
 			}
+
 			if *output == cmdutil.OutputJSON {
 				return cmdutil.PrintJSON(f.IOStreams.Out, history)
 			}
+
 			rows := make([][]string, len(history))
 			for index, entry := range history {
 				fromStatus := "-"
 				if entry.FromStatus != nil {
 					fromStatus = *entry.FromStatus
 				}
+
 				reason := "-"
 				if entry.Reason != nil {
 					reason = *entry.Reason
 				}
+
 				rows[index] = []string{fromStatus, entry.ToStatus, reason, cmdutil.FormatTime(entry.CreatedAt)}
 			}
+
 			table := cmdutil.NewTable("FROM", "TO", "REASON", "CHANGED AT").Rows(rows...)
 			_, _ = fmt.Fprintln(f.IOStreams.Out, table)
+
 			return nil
 		},
 	}
 	cmd.Flags().IntVar(&limit, "limit", 100, "Maximum number of history entries to return")
 	output = cmdutil.AddOutputFlag(cmd)
+
 	return cmd
 }
 
@@ -732,11 +804,14 @@ func renderIncident(f *cmdutil.Factory, current *incident) error {
 	if current.CommissionerNotificationDueAt != nil {
 		rows = append(rows, []string{"Commissioner due", cmdutil.FormatTime(*current.CommissionerNotificationDueAt)})
 	}
+
 	if current.DataSubjectsNotificationDueAt != nil {
 		rows = append(rows, []string{"Data subjects due", cmdutil.FormatTime(*current.DataSubjectsNotificationDueAt)})
 	}
+
 	table := cmdutil.NewTable("FIELD", "VALUE").Rows(rows...)
 	_, _ = fmt.Fprintln(f.IOStreams.Out, table)
+
 	return nil
 }
 
@@ -745,6 +820,7 @@ func parseRFC3339(flagName, value string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("invalid --%s: use RFC3339 format: %w", flagName, err)
 	}
+
 	return parsed.Format(time.RFC3339), nil
 }
 

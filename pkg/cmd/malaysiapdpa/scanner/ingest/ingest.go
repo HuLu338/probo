@@ -137,6 +137,7 @@ func NewCmdIngest(f *cmdutil.Factory) *cobra.Command {
 			if organizationID == "" {
 				organizationID = hc.Organization
 			}
+
 			if organizationID == "" {
 				return fmt.Errorf("organization ID is required: pass --org or run `prb auth login`")
 			}
@@ -181,6 +182,7 @@ func NewCmdIngest(f *cmdutil.Factory) *cobra.Command {
 			if result.Created {
 				action = "Created"
 			}
+
 			_, _ = fmt.Fprintf(
 				f.IOStreams.Out,
 				"%s scanner finding %s and compliance finding %s (%s)\n",

@@ -58,5 +58,6 @@ func TransferNextReviewAt(basis coredata.MalaysiaPDPATransferBasis, reviewedAt t
 		reviewedAt.Nanosecond(),
 		reviewedAt.Location(),
 	)
+
 	return &nextReviewAt
 }

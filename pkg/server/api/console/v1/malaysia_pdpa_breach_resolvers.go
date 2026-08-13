@@ -37,7 +37,9 @@ func (r *malaysiaPDPABreachIncidentResolver) Organization(ctx context.Context, o
 		if errors.Is(err, coredata.ErrResourceNotFound) {
 			return nil, gqlutils.NotFound(ctx, err)
 		}
+
 		r.logger.ErrorCtx(ctx, "cannot load Malaysia PDPA breach organization", log.Error(err))
+
 		return nil, gqlutils.Internal(ctx)
 	}
 
@@ -61,6 +63,7 @@ func (r *malaysiaPDPABreachIncidentResolver) StatusHistory(ctx context.Context, 
 	}
 
 	cursor := types.NewCursor(first, after, last, before, pageOrderBy)
+
 	historyPage, err := r.probo.MalaysiaPDPABreaches.ListStatusHistory(ctx, scope, obj.ID, cursor)
 	if err != nil {
 		r.logger.ErrorCtx(ctx, "cannot list Malaysia PDPA breach status history", log.Error(err))

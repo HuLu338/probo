@@ -22,13 +22,16 @@ func (r *mutationResolver) newMalaysiaPDPATransferRequest(
 	}
 
 	var approverProfileID gid.GID
+
 	if input.ApprovalStatus != coredata.MalaysiaPDPATransferApprovalStatusPending {
 		identity := authn.IdentityFromContext(ctx)
+
 		approver, err := r.iam.OrganizationService.GetProfileForIdentityAndOrganization(ctx, identity.ID, organizationID)
 		if err != nil {
 			r.logger.ErrorCtx(ctx, "cannot get Malaysia PDPA transfer approver profile", log.Error(err))
 			return nil, gqlutils.Internal(ctx)
 		}
+
 		approverProfileID = approver.ID
 	}
 

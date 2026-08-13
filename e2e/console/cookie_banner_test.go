@@ -48,6 +48,9 @@ func TestCookieBanner_Create(t *testing.T) {
 							cookiePolicyUrl
 							consentExpiryDays
 							showBranding
+							capabilities {
+								resourceReporting
+							}
 							defaultLanguage
 							createdAt
 							updatedAt
@@ -71,9 +74,12 @@ func TestCookieBanner_Create(t *testing.T) {
 						CookiePolicyUrl   string `json:"cookiePolicyUrl"`
 						ConsentExpiryDays int    `json:"consentExpiryDays"`
 						ShowBranding      bool   `json:"showBranding"`
-						DefaultLanguage   string `json:"defaultLanguage"`
-						CreatedAt         string `json:"createdAt"`
-						UpdatedAt         string `json:"updatedAt"`
+						Capabilities      struct {
+							ResourceReporting bool `json:"resourceReporting"`
+						} `json:"capabilities"`
+						DefaultLanguage string `json:"defaultLanguage"`
+						CreatedAt       string `json:"createdAt"`
+						UpdatedAt       string `json:"updatedAt"`
 					} `json:"node"`
 				} `json:"cookieBannerEdge"`
 			} `json:"createCookieBanner"`
@@ -97,6 +103,7 @@ func TestCookieBanner_Create(t *testing.T) {
 		assert.Equal(t, "ACTIVE", node.State)
 		assert.Equal(t, "https://example.com/cookies", node.CookiePolicyUrl)
 		assert.Equal(t, 365, node.ConsentExpiryDays)
+		assert.True(t, node.Capabilities.ResourceReporting)
 		assert.Equal(t, "en", node.DefaultLanguage)
 		assert.NotEmpty(t, node.CreatedAt)
 		assert.NotEmpty(t, node.UpdatedAt)
@@ -332,6 +339,48 @@ func TestCookieBanner_Update(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 90, result.UpdateCookieBanner.CookieBanner.ConsentExpiryDays)
 		assert.Equal(t, "fr", result.UpdateCookieBanner.CookieBanner.DefaultLanguage)
+	})
+
+	t.Run("disable resource reporting", func(t *testing.T) {
+		t.Parallel()
+		owner := testutil.NewClient(t, testutil.RoleOwner)
+
+		bannerID := factory.CreateCookieBanner(owner)
+
+		const query = `
+			mutation UpdateCookieBanner($input: UpdateCookieBannerInput!) {
+				updateCookieBanner(input: $input) {
+					cookieBanner {
+						id
+						capabilities {
+							resourceReporting
+						}
+					}
+				}
+			}
+		`
+
+		var result struct {
+			UpdateCookieBanner struct {
+				CookieBanner struct {
+					ID           string `json:"id"`
+					Capabilities struct {
+						ResourceReporting bool `json:"resourceReporting"`
+					} `json:"capabilities"`
+				} `json:"cookieBanner"`
+			} `json:"updateCookieBanner"`
+		}
+
+		err := owner.Execute(query, map[string]any{
+			"input": map[string]any{
+				"cookieBannerId": bannerID,
+				"capabilities":   map[string]any{"resourceReporting": false},
+			},
+		}, &result)
+
+		require.NoError(t, err)
+		assert.Equal(t, bannerID, result.UpdateCookieBanner.CookieBanner.ID)
+		assert.False(t, result.UpdateCookieBanner.CookieBanner.Capabilities.ResourceReporting)
 	})
 }
 

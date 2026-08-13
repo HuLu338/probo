@@ -84,6 +84,7 @@ func TestNewCmdImportOpenList_ImportsScanReport(t *testing.T) {
 					Input map[string]any `json:"input"`
 				} `json:"variables"`
 			}
+
 			_ = json.NewDecoder(r.Body).Decode(&request)
 
 			proboRequests <- capturedRequest{

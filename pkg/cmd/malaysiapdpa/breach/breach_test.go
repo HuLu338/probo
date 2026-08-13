@@ -42,6 +42,7 @@ func TestNewCmdView_ReturnsPhasedInformationOverdue(t *testing.T) {
 			Query string `json:"query"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
+
 		queries <- request.Query
 
 		w.Header().Set("Content-Type", "application/json")
@@ -68,6 +69,6 @@ func TestNewCmdView_ReturnsPhasedInformationOverdue(t *testing.T) {
 	assert.Contains(t, <-queries, "phasedInformationOverdue")
 
 	var result map[string]any
-	require.NoError(t, json.Unmarshal([]byte(out.String()), &result))
+	require.NoError(t, json.Unmarshal(out.Bytes(), &result))
 	assert.Equal(t, true, result["phasedInformationOverdue"])
 }

@@ -88,12 +88,15 @@ func NewClient(
 	if (baseURL.Scheme != "http" && baseURL.Scheme != "https") || baseURL.Host == "" {
 		return nil, fmt.Errorf("OpenList scanner URL must be an absolute HTTP or HTTPS URL")
 	}
+
 	if baseURL.User != nil || baseURL.RawQuery != "" || baseURL.Fragment != "" {
 		return nil, fmt.Errorf("OpenList scanner URL must not contain credentials, a query, or a fragment")
 	}
+
 	if strings.TrimSpace(apiKey) == "" {
 		return nil, fmt.Errorf("OpenList scanner API key is required")
 	}
+
 	if timeout <= 0 {
 		return nil, fmt.Errorf("OpenList scanner HTTP timeout must be positive")
 	}
@@ -110,6 +113,7 @@ func NewClient(
 	for _, option := range options {
 		option(client)
 	}
+
 	if client.httpClient == nil {
 		return nil, fmt.Errorf("OpenList scanner HTTP client is required")
 	}
@@ -145,6 +149,7 @@ func (c *Client) GetScanReport(ctx context.Context, scanID int64) (*ScanReport, 
 	if err != nil {
 		return nil, fmt.Errorf("cannot create OpenList scan report request: %w", err)
 	}
+
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("User-Agent", version.UserAgent("prb-openlist-adapter"))
 	request.Header.Set("X-API-Key", c.apiKey)
@@ -153,12 +158,14 @@ func (c *Client) GetScanReport(ctx context.Context, scanID int64) (*ScanReport, 
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch OpenList scan report: %w", err)
 	}
+
 	defer func() { _ = response.Body.Close() }()
 
 	body, err := io.ReadAll(io.LimitReader(response.Body, maxScanReportResponseBytes+1))
 	if err != nil {
 		return nil, fmt.Errorf("cannot read OpenList scan report response: %w", err)
 	}
+
 	if len(body) > maxScanReportResponseBytes {
 		return nil, fmt.Errorf("OpenList scan report response exceeds %d bytes", maxScanReportResponseBytes)
 	}
@@ -180,6 +187,7 @@ func (c *Client) GetScanReport(ctx context.Context, scanID int64) (*ScanReport, 
 	if err := json.Unmarshal(body, &report); err != nil {
 		return nil, fmt.Errorf("cannot decode OpenList scan report: %w", err)
 	}
+
 	if report.ID != scanID {
 		return nil, fmt.Errorf("OpenList scanner returned report ID %d for requested scan %d", report.ID, scanID)
 	}

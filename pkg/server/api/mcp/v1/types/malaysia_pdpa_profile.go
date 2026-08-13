@@ -34,6 +34,7 @@ func NewMalaysiaPDPAProfile(p *coredata.MalaysiaPDPAProfile) *MalaysiaPDPAProfil
 	}
 
 	var commissionerNotificationDueAt *time.Time
+
 	if p.DPOAppointedAt != nil {
 		dueAt := p.DPOAppointedAt.AddDate(0, 0, 21)
 		commissionerNotificationDueAt = &dueAt

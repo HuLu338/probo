@@ -42,6 +42,7 @@ func TestNewCmdGet_ReturnsDPOAssessmentProvenance(t *testing.T) {
 			Query string `json:"query"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&request))
+
 		queries <- request.Query
 
 		w.Header().Set("Content-Type", "application/json")
@@ -65,12 +66,13 @@ func TestNewCmdGet_ReturnsDPOAssessmentProvenance(t *testing.T) {
 	cmd.SetArgs([]string{"--org", "organization-id", "--output", "json"})
 
 	require.NoError(t, cmd.Execute())
+
 	query := <-queries
 	assert.Contains(t, query, "ruleVersion")
 	assert.Contains(t, query, "ruleSource")
 
 	var profile map[string]any
-	require.NoError(t, json.Unmarshal([]byte(out.String()), &profile))
+	require.NoError(t, json.Unmarshal(out.Bytes(), &profile))
 	assert.Equal(t, "MY-PDPA-DPO-2025-06-01", profile["ruleVersion"])
 	assert.Contains(t, profile["ruleSource"], "pdp.gov.my")
 }

@@ -91,6 +91,7 @@ func TestMalaysiaPDPAScannerFinding_IdempotentIngestionAndRBAC(t *testing.T) {
 			} `json:"finding"`
 		} `json:"updateFinding"`
 	}
+
 	err := owner.Execute(
 		`mutation($input: UpdateFindingInput!) { updateFinding(input: $input) { finding { id } } }`,
 		map[string]any{"input": map[string]any{
@@ -120,6 +121,7 @@ func TestMalaysiaPDPAScannerFinding_IdempotentIngestionAndRBAC(t *testing.T) {
 	var viewerNode struct {
 		Node *malaysiaPDPAScannerFindingResult `json:"node"`
 	}
+
 	err = viewer.Execute(`query($id: ID!) { node(id: $id) { ... on MalaysiaPDPAScannerFinding { id evidence finding { id } } } }`, map[string]any{"id": created.ScannerFinding.ID}, &viewerNode)
 	require.NoError(t, err)
 	require.NotNil(t, viewerNode.Node)
@@ -132,6 +134,7 @@ func TestMalaysiaPDPAScannerFinding_IdempotentIngestionAndRBAC(t *testing.T) {
 			ScannerFinding *malaysiaPDPAScannerFindingResult `json:"malaysiaPDPAScannerFinding"`
 		} `json:"node"`
 	}
+
 	err = viewer.Execute(
 		`query($id: ID!) { node(id: $id) { ... on Finding { id malaysiaPDPAScannerFinding { id source ruleVersion evidence } } } }`,
 		map[string]any{"id": created.ScannerFinding.Finding.ID},
@@ -152,6 +155,7 @@ func TestMalaysiaPDPAScannerFinding_IdempotentIngestionAndRBAC(t *testing.T) {
 	var inaccessible struct {
 		Node *malaysiaPDPAScannerFindingResult `json:"node"`
 	}
+
 	err = otherOwner.Execute(`query($id: ID!) { node(id: $id) { ... on MalaysiaPDPAScannerFinding { id } } }`, map[string]any{"id": created.ScannerFinding.ID}, &inaccessible)
 	testutil.AssertNodeNotAccessible(t, err, inaccessible.Node == nil, "Malaysia PDPA scanner finding")
 
@@ -160,6 +164,7 @@ func TestMalaysiaPDPAScannerFinding_IdempotentIngestionAndRBAC(t *testing.T) {
 			ID string `json:"id"`
 		} `json:"node"`
 	}
+
 	err = otherOwner.Execute(
 		`query($id: ID!) { node(id: $id) { ... on Finding { id malaysiaPDPAScannerFinding { id } } } }`,
 		map[string]any{"id": created.ScannerFinding.Finding.ID},
@@ -178,6 +183,7 @@ func ingestMalaysiaPDPAScannerFinding(
 	var result struct {
 		Ingest ingestMalaysiaPDPAScannerFindingResult `json:"ingestMalaysiaPDPAScannerFinding"`
 	}
+
 	err := client.Execute(
 		ingestMalaysiaPDPAScannerFindingMutation,
 		map[string]any{"input": input},

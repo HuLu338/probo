@@ -234,6 +234,7 @@ func TestMCP_MalaysiaPDPATransfer_Create(t *testing.T) {
 
 	processingActivityInput := mcpAddProcessingActivityInput(organizationID, factory.SafeName("Malaysia transfer"))
 	processingActivityInput["international_transfers"] = true
+
 	var processingActivityResult struct {
 		ProcessingActivity struct {
 			ID string `json:"id"`

@@ -318,17 +318,21 @@ func validateMalaysiaPDPATransferRequest(v *validator.Validator, req *MalaysiaPD
 
 	v.Check(req.Basis, "malaysia_pdpa.basis", validator.Required(), validator.OneOfSlice(coredata.MalaysiaPDPATransferBases()))
 	v.Check(req.RecipientThirdPartyID, "malaysia_pdpa.recipient_third_party_id", validator.Required(), validator.GID(coredata.ThirdPartyEntityType))
+
 	if !isBlank(req.ReceiverRegistrationNumber) {
 		v.Check(req.ReceiverRegistrationNumber, "malaysia_pdpa.receiver_registration_number", validator.SafeTextNoNewLine(TitleMaxLength))
 	}
+
 	v.Check(req.ReceiverContact, "malaysia_pdpa.receiver_contact", validator.Required(), validator.SafeText(ContentMaxLength))
 	v.Check(req.TransferPurpose, "malaysia_pdpa.transfer_purpose", validator.Required(), validator.SafeText(ContentMaxLength))
 	v.Check(req.PersonalDataCategories, "malaysia_pdpa.personal_data_categories", validator.Required(), validator.SafeText(ContentMaxLength))
 	v.Check(req.Safeguards, "malaysia_pdpa.safeguards", validator.Required(), validator.SafeText(ContentMaxLength))
 	v.Check(req.ApprovalStatus, "malaysia_pdpa.approval_status", validator.Required(), validator.OneOfSlice(coredata.MalaysiaPDPATransferApprovalStatuses()))
+
 	if !isBlank(req.ApprovalNotes) {
 		v.Check(req.ApprovalNotes, "malaysia_pdpa.approval_notes", validator.SafeText(ContentMaxLength))
 	}
+
 	if !isBlank(req.ReviewEvidence) {
 		v.Check(req.ReviewEvidence, "malaysia_pdpa.review_evidence", validator.SafeText(ContentMaxLength))
 	}
@@ -341,6 +345,7 @@ func validateMalaysiaPDPATransferRequest(v *validator.Validator, req *MalaysiaPD
 
 	if req.ApprovalStatus == coredata.MalaysiaPDPATransferApprovalStatusApproved {
 		v.Check(req.ApprovedByProfileID, "malaysia_pdpa.approved_by_profile_id", validator.Required(), validator.GID(coredata.MembershipProfileEntityType))
+
 		if isBlank(req.ReviewEvidence) {
 			v.Check(req.ReviewEvidence, "malaysia_pdpa.review_evidence", func(any) *validator.ValidationError {
 				return &validator.ValidationError{Code: validator.ErrorCodeRequired, Message: "is required for approval"}
@@ -350,6 +355,7 @@ func validateMalaysiaPDPATransferRequest(v *validator.Validator, req *MalaysiaPD
 
 	if req.ApprovalStatus == coredata.MalaysiaPDPATransferApprovalStatusRejected {
 		v.Check(req.ApprovedByProfileID, "malaysia_pdpa.approved_by_profile_id", validator.Required(), validator.GID(coredata.MembershipProfileEntityType))
+
 		if isBlank(req.ApprovalNotes) {
 			v.Check(req.ApprovalNotes, "malaysia_pdpa.approval_notes", func(any) *validator.ValidationError {
 				return &validator.ValidationError{Code: validator.ErrorCodeRequired, Message: "is required for rejection"}
@@ -381,13 +387,17 @@ func applyMalaysiaPDPATransfer(
 	if err := recipient.LoadByID(ctx, conn, scope, req.RecipientThirdPartyID); err != nil {
 		return fmt.Errorf("cannot load Malaysia PDPA transfer recipient: %w", err)
 	}
+
 	if recipient.OrganizationID != tia.OrganizationID {
-		return fmt.Errorf("Malaysia PDPA transfer recipient does not belong to the organization")
+		return fmt.Errorf("transfer recipient does not belong to the organization")
 	}
 
-	var approvedByProfileID *gid.GID
-	var reviewedAt *time.Time
-	var nextReviewAt *time.Time
+	var (
+		approvedByProfileID *gid.GID
+		reviewedAt          *time.Time
+		nextReviewAt        *time.Time
+	)
+
 	if req.ApprovalStatus != coredata.MalaysiaPDPATransferApprovalStatusPending {
 		if err := validateProfileOrganization(ctx, conn, scope, req.ApprovedByProfileID, tia.OrganizationID, "transfer approver"); err != nil {
 			return err
@@ -395,6 +405,7 @@ func applyMalaysiaPDPATransfer(
 
 		now := time.Now()
 		approvedByProfileID = &req.ApprovedByProfileID
+
 		reviewedAt = &now
 		if req.ApprovalStatus == coredata.MalaysiaPDPATransferApprovalStatusApproved {
 			nextReviewAt = malaysiapdpa.TransferNextReviewAt(req.Basis, now)

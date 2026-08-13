@@ -72,6 +72,7 @@ func (r *mutationResolver) UpdateProcessingActivity(ctx context.Context, input t
 	}
 
 	var malaysiaPDPAScreening *probo.MalaysiaPDPADPIAScreeningRequest
+
 	if input.MalaysiaPDPADPIAScreening != nil {
 		activity, err := r.probo.ProcessingActivities.Get(ctx, scope, input.ID)
 		if err != nil {
@@ -80,6 +81,7 @@ func (r *mutationResolver) UpdateProcessingActivity(ctx context.Context, input t
 		}
 
 		identity := authn.IdentityFromContext(ctx)
+
 		assessor, err := r.iam.OrganizationService.GetProfileForIdentityAndOrganization(ctx, identity.ID, activity.OrganizationID)
 		if err != nil {
 			r.logger.ErrorCtx(ctx, "cannot get Malaysia PDPA DPIA assessor profile", log.Error(err))
@@ -133,6 +135,7 @@ func (r *mutationResolver) UpdateProcessingActivity(ctx context.Context, input t
 		}
 
 		r.logger.ErrorCtx(ctx, "cannot update processing activity", log.Error(err))
+
 		return nil, gqlutils.Internal(ctx)
 	}
 

@@ -1215,18 +1215,25 @@ func (r *mutationResolver) UpdateCompliancePortal(ctx context.Context, input typ
 		return nil, err
 	}
 
+	var capabilities *coredata.CompliancePortalCapabilitiesPatch
+	if input.Capabilities != nil {
+		capabilities = &coredata.CompliancePortalCapabilitiesPatch{
+			RightsRequests: input.Capabilities.RightsRequests,
+		}
+	}
+
 	compliancePortal, _, err := r.management.Update(
 		ctx, scope,
 		&management.UpdateRequest{
-			ID:                    input.CompliancePortalID,
-			Active:                input.Active,
-			SearchEngineIndexing:  input.SearchEngineIndexing,
-			RightsRequestsEnabled: input.RightsRequestsEnabled,
-			Description:           gqlutils.UnwrapOmittable(input.Description),
-			WebsiteURL:            gqlutils.UnwrapOmittable(input.WebsiteURL),
-			Email:                 gqlutils.UnwrapOmittable(input.Email),
-			HeadquarterAddress:    gqlutils.UnwrapOmittable(input.HeadquarterAddress),
-			EntityName:            input.EntityName,
+			ID:                   input.CompliancePortalID,
+			Active:               input.Active,
+			SearchEngineIndexing: input.SearchEngineIndexing,
+			Capabilities:         capabilities,
+			Description:          gqlutils.UnwrapOmittable(input.Description),
+			WebsiteURL:           gqlutils.UnwrapOmittable(input.WebsiteURL),
+			Email:                gqlutils.UnwrapOmittable(input.Email),
+			HeadquarterAddress:   gqlutils.UnwrapOmittable(input.HeadquarterAddress),
+			EntityName:           input.EntityName,
 		},
 	)
 	if err != nil {

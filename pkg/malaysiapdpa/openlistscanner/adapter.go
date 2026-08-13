@@ -66,12 +66,15 @@ func BuildIngestFindings(
 	if report == nil {
 		return nil, fmt.Errorf("OpenList scan report is required")
 	}
+
 	if report.ID <= 0 {
 		return nil, fmt.Errorf("OpenList scan report ID must be positive")
 	}
+
 	if !strings.EqualFold(strings.TrimSpace(report.Platform), scannerSource) {
 		return nil, fmt.Errorf("unsupported scanner platform %q", report.Platform)
 	}
+
 	if report.ScanTime.IsZero() {
 		return nil, fmt.Errorf("OpenList scan time is required")
 	}
@@ -79,15 +82,19 @@ func BuildIngestFindings(
 	targetID = strings.TrimSpace(targetID)
 	ruleVersion = strings.TrimSpace(ruleVersion)
 	ruleSource = strings.TrimSpace(ruleSource)
+
 	if targetID == "" {
 		return nil, fmt.Errorf("stable OpenList target ID is required")
 	}
+
 	if strings.ContainsAny(targetID, ":\r\n") {
 		return nil, fmt.Errorf("stable OpenList target ID must not contain a colon or newline")
 	}
+
 	if ruleVersion == "" {
 		return nil, fmt.Errorf("OpenList rule version is required")
 	}
+
 	if ruleSource == "" {
 		return nil, fmt.Errorf("OpenList rule source is required")
 	}
@@ -116,6 +123,7 @@ func buildIngestFinding(
 	if ruleID == "" {
 		return IngestFinding{}, fmt.Errorf("OpenList risk rule ID is required")
 	}
+
 	if strings.ContainsAny(ruleID, "\r\n") {
 		return IngestFinding{}, fmt.Errorf("OpenList risk rule ID must not contain a newline")
 	}
@@ -134,6 +142,7 @@ func buildIngestFinding(
 	if summary == "" {
 		summary = strings.TrimSpace(risk.Description)
 	}
+
 	if summary == "" {
 		return IngestFinding{}, fmt.Errorf("OpenList risk summary is required for rule %q", ruleID)
 	}
@@ -152,6 +161,7 @@ func buildIngestFinding(
 	if err != nil {
 		return IngestFinding{}, fmt.Errorf("cannot encode OpenList evidence for rule %q: %w", ruleID, err)
 	}
+
 	if len(evidence) > malaysiapdpa.ScannerFindingEvidenceMaxBytes {
 		return IngestFinding{}, fmt.Errorf("OpenList evidence for rule %q exceeds %d bytes", ruleID, malaysiapdpa.ScannerFindingEvidenceMaxBytes)
 	}

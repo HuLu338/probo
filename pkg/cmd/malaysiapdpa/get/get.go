@@ -176,6 +176,7 @@ func NewCmdGet(f *cmdutil.Factory) *cobra.Command {
 					cmdutil.FormatTime(*profile.CommissionerNotificationDueAt),
 				)
 			}
+
 			_, _ = fmt.Fprintf(
 				out,
 				"%s%t\n",

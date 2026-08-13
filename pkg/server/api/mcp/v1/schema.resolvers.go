@@ -1165,6 +1165,7 @@ func (r *Resolver) UpdateProcessingActivityTool(ctx context.Context, req *mcp.Ca
 	}
 
 	var malaysiaPDPAScreening *probo.MalaysiaPDPADPIAScreeningRequest
+
 	if screening := input.MalaysiaPdpaDpiaScreening; screening != nil {
 		activity, err := svc.ProcessingActivities.Get(ctx, scope, input.ID)
 		if err != nil {
@@ -1172,6 +1173,7 @@ func (r *Resolver) UpdateProcessingActivityTool(ctx context.Context, req *mcp.Ca
 		}
 
 		identity := authn.IdentityFromContext(ctx)
+
 		assessor, err := r.iamSvc.OrganizationService.GetProfileForIdentityAndOrganization(ctx, identity.ID, activity.OrganizationID)
 		if err != nil {
 			return nil, types.UpdateProcessingActivityOutput{}, fmt.Errorf("failed to get Malaysia PDPA DPIA assessor profile: %w", err)
@@ -1405,6 +1407,7 @@ func (r *Resolver) AddTransferImpactAssessmentTool(ctx context.Context, req *mcp
 	}
 
 	svc := r.proboSvc
+
 	activity, err := svc.ProcessingActivities.Get(ctx, scope, input.ProcessingActivityID)
 	if err != nil {
 		return nil, types.AddTransferImpactAssessmentOutput{}, fmt.Errorf("failed to load processing activity for Malaysia PDPA transfer: %w", err)
@@ -1443,6 +1446,7 @@ func (r *Resolver) UpdateTransferImpactAssessmentTool(ctx context.Context, req *
 	}
 
 	svc := r.proboSvc
+
 	currentTIA, err := svc.TransferImpactAssessments.Get(ctx, scope, input.ID)
 	if err != nil {
 		return nil, types.UpdateTransferImpactAssessmentOutput{}, fmt.Errorf("failed to load transfer impact assessment for Malaysia PDPA transfer: %w", err)
@@ -1484,12 +1488,15 @@ func (r *Resolver) newMalaysiaPDPATransferRequest(
 	}
 
 	var approverProfileID gid.GID
+
 	if input.ApprovalStatus != coredata.MalaysiaPDPATransferApprovalStatusPending {
 		identity := authn.IdentityFromContext(ctx)
+
 		approver, err := r.iamSvc.OrganizationService.GetProfileForIdentityAndOrganization(ctx, identity.ID, organizationID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get Malaysia PDPA transfer approver profile: %w", err)
 		}
+
 		approverProfileID = approver.ID
 	}
 
@@ -5112,8 +5119,10 @@ func (r *Resolver) UpdateCompliancePortalTool(ctx context.Context, req *mcp.Call
 		updateReq.SearchEngineIndexing = *sei
 	}
 
-	if rightsRequestsEnabled := UnwrapOmittable(input.RightsRequestsEnabled); rightsRequestsEnabled != nil {
-		updateReq.RightsRequestsEnabled = *rightsRequestsEnabled
+	if capabilities := UnwrapOmittable(input.Capabilities); capabilities != nil && *capabilities != nil {
+		updateReq.Capabilities = &coredata.CompliancePortalCapabilitiesPatch{
+			RightsRequests: (*capabilities).RightsRequests,
+		}
 	}
 
 	updateReq.Description = UnwrapOmittable(input.Description)
@@ -5745,6 +5754,12 @@ func (r *Resolver) UpdateCookieBannerTool(ctx context.Context, req *mcp.CallTool
 
 	if v := UnwrapOmittable(input.DefaultLanguage); v != nil && *v != nil {
 		updateReq.DefaultLanguage = *v
+	}
+
+	if v := UnwrapOmittable(input.Capabilities); v != nil && *v != nil {
+		updateReq.Capabilities = &coredata.CookieBannerCapabilitiesPatch{
+			ResourceReporting: (*v).ResourceReporting,
+		}
 	}
 
 	banner, err := r.cookieBanner.UpdateCookieBanner(ctx, scope, updateReq)
@@ -6517,10 +6532,19 @@ func (r *Resolver) AddRiskAnalysisTool(ctx context.Context, req *mcp.CallToolReq
 		return nil, types.AddRiskAnalysisOutput{}, err
 	}
 
+	var period *riskmanagement.Period
+	if input.Period != nil {
+		period = &riskmanagement.Period{
+			Start: input.Period.Start,
+			End:   input.Period.End,
+		}
+	}
+
 	ra, err := r.riskManagement.Create(ctx, scope, riskmanagement.CreateRiskAnalysisRequest{
 		OrganizationID: input.OrganizationID,
 		Name:           input.Name,
 		Description:    input.Description,
+		Period:         period,
 	})
 	if err != nil {
 		return nil, types.AddRiskAnalysisOutput{}, fmt.Errorf("failed to create risk analysis: %w", err)
@@ -6537,10 +6561,19 @@ func (r *Resolver) UpdateRiskAnalysisTool(ctx context.Context, req *mcp.CallTool
 		return nil, types.UpdateRiskAnalysisOutput{}, err
 	}
 
+	var period *riskmanagement.Period
+	if input.Period != nil {
+		period = &riskmanagement.Period{
+			Start: input.Period.Start,
+			End:   input.Period.End,
+		}
+	}
+
 	ra, err := r.riskManagement.Update(ctx, scope, riskmanagement.UpdateRiskAnalysisRequest{
 		ID:          input.ID,
 		Name:        input.Name,
 		Description: UnwrapOmittable(input.Description),
+		Period:      period,
 	})
 	if err != nil {
 		return nil, types.UpdateRiskAnalysisOutput{}, fmt.Errorf("failed to update risk analysis: %w", err)
@@ -8299,6 +8332,7 @@ func (r *Resolver) UpdateMalaysiaPDPAProfileTool(ctx context.Context, req *mcp.C
 	}
 
 	identity := authn.IdentityFromContext(ctx)
+
 	assessor, err := r.iamSvc.OrganizationService.GetProfileForIdentityAndOrganization(
 		ctx,
 		identity.ID,
@@ -8356,6 +8390,7 @@ func (r *Resolver) ListMalaysiaPDPABreachIncidentsTool(ctx context.Context, req 
 	}
 
 	cursor := types.NewCursor(input.Size, input.Cursor, orderBy)
+
 	incidentPage, err := r.proboSvc.MalaysiaPDPABreaches.ListForOrganizationID(ctx, scope, input.OrganizationID, cursor)
 	if err != nil {
 		r.logger.ErrorCtx(ctx, "cannot list Malaysia PDPA breach incidents", log.Error(err))
@@ -8536,6 +8571,7 @@ func (r *Resolver) ListMalaysiaPDPABreachStatusHistoryTool(ctx context.Context, 
 		Direction: page.OrderDirectionDesc,
 	}
 	cursor := types.NewCursor(input.Size, input.Cursor, orderBy)
+
 	historyPage, err := r.proboSvc.MalaysiaPDPABreaches.ListStatusHistory(ctx, scope, input.IncidentID, cursor)
 	if err != nil {
 		r.logger.ErrorCtx(ctx, "cannot list Malaysia PDPA breach status history", log.Error(err))
@@ -9080,6 +9116,7 @@ func (r *Resolver) IngestMalaysiaPDPAScannerFindingTool(ctx context.Context, req
 		}
 
 		r.logger.ErrorCtx(ctx, "cannot ingest Malaysia PDPA scanner finding", log.Error(err))
+
 		return nil, types.IngestMalaysiaPDPAScannerFindingOutput{}, fmt.Errorf("internal server error")
 	}
 
@@ -9125,18 +9162,223 @@ func (r *Resolver) IngestMalaysiaPDPAScannerFindingTool(ctx context.Context, req
 // 		approverProfileID = approver.ID
 // 	}
 
-// 	return &probo.MalaysiaPDPATransferRequest{
-// 		Basis:                      input.Basis,
-// 		DestinationCountry:         input.DestinationCountry,
-// 		RecipientThirdPartyID:      input.RecipientThirdPartyID,
-// 		ReceiverRegistrationNumber: input.ReceiverRegistrationNumber,
-// 		ReceiverContact:            input.ReceiverContact,
-// 		TransferPurpose:            input.TransferPurpose,
-// 		PersonalDataCategories:     input.PersonalDataCategories,
-// 		Safeguards:                 input.Safeguards,
-// 		ApprovalStatus:             input.ApprovalStatus,
-// 		ApprovalNotes:              input.ApprovalNotes,
-// 		ReviewEvidence:             input.ReviewEvidence,
-// 		ApprovedByProfileID:        approverProfileID,
-// 	}, nil
-// }
+//		return &probo.MalaysiaPDPATransferRequest{
+//			Basis:                      input.Basis,
+//			DestinationCountry:         input.DestinationCountry,
+//			RecipientThirdPartyID:      input.RecipientThirdPartyID,
+//			ReceiverRegistrationNumber: input.ReceiverRegistrationNumber,
+//			ReceiverContact:            input.ReceiverContact,
+//			TransferPurpose:            input.TransferPurpose,
+//			PersonalDataCategories:     input.PersonalDataCategories,
+//			Safeguards:                 input.Safeguards,
+//			ApprovalStatus:             input.ApprovalStatus,
+//			ApprovalNotes:              input.ApprovalNotes,
+//			ReviewEvidence:             input.ReviewEvidence,
+//			ApprovedByProfileID:        approverProfileID,
+//		}, nil
+//	}
+func (r *Resolver) ListAiSystemsTool(ctx context.Context, req *mcp.CallToolRequest, input *types.ListAiSystemsInput) (*mcp.CallToolResult, types.ListAiSystemsOutput, error) {
+	scope, err := r.Authorize(ctx, input.OrganizationID, probo.ActionAiSystemList)
+	if err != nil {
+		return nil, types.ListAiSystemsOutput{}, err
+	}
+
+	prb := r.proboSvc
+
+	pageOrderBy := page.OrderBy[coredata.AiSystemOrderField]{
+		Field:     coredata.AiSystemOrderFieldCreatedAt,
+		Direction: page.OrderDirectionDesc,
+	}
+
+	if input.OrderBy != nil {
+		pageOrderBy = page.OrderBy[coredata.AiSystemOrderField]{
+			Field:     input.OrderBy.Field,
+			Direction: input.OrderBy.Direction,
+		}
+	}
+
+	cursor := types.NewCursor(input.Size, input.Cursor, pageOrderBy)
+
+	var (
+		status             *coredata.AiSystemStatus
+		riskClassification *coredata.AiSystemRiskClassification
+	)
+
+	if input.Filter != nil {
+		status = input.Filter.Status
+		riskClassification = input.Filter.RiskClassification
+	}
+
+	aiSystemFilter := coredata.NewAiSystemFilter(status, riskClassification)
+
+	pageResult, err := prb.AiSystems.ListForOrganizationID(ctx, scope, input.OrganizationID, cursor, aiSystemFilter)
+	if err != nil {
+		return nil, types.ListAiSystemsOutput{}, fmt.Errorf("cannot list organization ai systems: %w", err)
+	}
+
+	return nil, types.NewListAiSystemsOutput(pageResult), nil
+}
+
+func (r *Resolver) GetAiSystemTool(ctx context.Context, req *mcp.CallToolRequest, input *types.GetAiSystemInput) (*mcp.CallToolResult, types.GetAiSystemOutput, error) {
+	scope, err := r.Authorize(ctx, input.ID, probo.ActionAiSystemGet)
+	if err != nil {
+		return nil, types.GetAiSystemOutput{}, err
+	}
+
+	prb := r.proboSvc
+
+	aiSystem, err := prb.AiSystems.Get(ctx, scope, input.ID)
+	if err != nil {
+		return nil, types.GetAiSystemOutput{}, fmt.Errorf("cannot get ai system: %w", err)
+	}
+
+	return nil, types.GetAiSystemOutput{
+		AiSystem: types.NewAiSystem(aiSystem),
+	}, nil
+}
+
+func (r *Resolver) AddAiSystemTool(ctx context.Context, req *mcp.CallToolRequest, input *types.AddAiSystemInput) (*mcp.CallToolResult, types.AddAiSystemOutput, error) {
+	scope, err := r.Authorize(ctx, input.OrganizationID, probo.ActionAiSystemCreate)
+	if err != nil {
+		return nil, types.AddAiSystemOutput{}, err
+	}
+
+	svc := r.proboSvc
+
+	riskClassification := input.RiskClassification
+
+	aiSystem, err := svc.AiSystems.Create(
+		ctx,
+		scope,
+		&probo.CreateAiSystemRequest{
+			OrganizationID:          input.OrganizationID,
+			Name:                    input.Name,
+			Version:                 input.Version,
+			CompanyRoles:            input.CompanyRoles,
+			Status:                  input.Status,
+			OwnerID:                 input.OwnerID,
+			Source:                  input.Source,
+			Purpose:                 input.Purpose,
+			IntendedUseCases:        input.IntendedUseCases,
+			AutonomyLevel:           input.AutonomyLevel,
+			HumanOversightMechanism: input.HumanOversightMechanism,
+			RiskClassification:      &riskClassification,
+			KeyStakeholders:         input.KeyStakeholders,
+			DataSourcesAndType:      input.DataSourcesAndType,
+			DeploymentDate:          input.DeploymentDate,
+			LastReviewDate:          input.LastReviewDate,
+			NextReviewDate:          input.NextReviewDate,
+			Notes:                   input.Notes,
+		},
+	)
+	if err != nil {
+		return nil, types.AddAiSystemOutput{}, fmt.Errorf("cannot create ai system: %w", err)
+	}
+
+	return nil, types.AddAiSystemOutput{
+		AiSystem: types.NewAiSystem(aiSystem),
+	}, nil
+}
+
+func (r *Resolver) UpdateAiSystemTool(ctx context.Context, req *mcp.CallToolRequest, input *types.UpdateAiSystemInput) (*mcp.CallToolResult, types.UpdateAiSystemOutput, error) {
+	scope, err := r.Authorize(ctx, input.ID, probo.ActionAiSystemUpdate)
+	if err != nil {
+		return nil, types.UpdateAiSystemOutput{}, err
+	}
+
+	svc := r.proboSvc
+
+	var (
+		name               **string
+		status             **coredata.AiSystemStatus
+		riskClassification **coredata.AiSystemRiskClassification
+	)
+
+	if input.Name != nil {
+		name = &input.Name
+	}
+
+	if input.Status != nil {
+		status = &input.Status
+	}
+
+	if input.RiskClassification != nil {
+		riskClassification = &input.RiskClassification
+	}
+
+	updateReq := &probo.UpdateAiSystemRequest{
+		ID:                      input.ID,
+		Name:                    name,
+		Version:                 UnwrapOmittable(input.Version),
+		Status:                  status,
+		OwnerID:                 UnwrapOmittable(input.OwnerID),
+		Source:                  UnwrapOmittable(input.Source),
+		Purpose:                 UnwrapOmittable(input.Purpose),
+		IntendedUseCases:        UnwrapOmittable(input.IntendedUseCases),
+		AutonomyLevel:           UnwrapOmittable(input.AutonomyLevel),
+		HumanOversightMechanism: UnwrapOmittable(input.HumanOversightMechanism),
+		RiskClassification:      riskClassification,
+		KeyStakeholders:         UnwrapOmittable(input.KeyStakeholders),
+		DataSourcesAndType:      UnwrapOmittable(input.DataSourcesAndType),
+		DeploymentDate:          UnwrapOmittable(input.DeploymentDate),
+		LastReviewDate:          UnwrapOmittable(input.LastReviewDate),
+		NextReviewDate:          UnwrapOmittable(input.NextReviewDate),
+		Notes:                   UnwrapOmittable(input.Notes),
+	}
+
+	if input.CompanyRoles != nil {
+		updateReq.CompanyRoles = &input.CompanyRoles
+	}
+
+	aiSystem, err := svc.AiSystems.Update(ctx, scope, updateReq)
+	if err != nil {
+		return nil, types.UpdateAiSystemOutput{}, fmt.Errorf("cannot update ai system: %w", err)
+	}
+
+	return nil, types.UpdateAiSystemOutput{
+		AiSystem: types.NewAiSystem(aiSystem),
+	}, nil
+}
+
+func (r *Resolver) DeleteAiSystemTool(ctx context.Context, req *mcp.CallToolRequest, input *types.DeleteAiSystemInput) (*mcp.CallToolResult, types.DeleteAiSystemOutput, error) {
+	scope, err := r.Authorize(ctx, input.ID, probo.ActionAiSystemDelete)
+	if err != nil {
+		return nil, types.DeleteAiSystemOutput{}, err
+	}
+
+	svc := r.proboSvc
+
+	err = svc.AiSystems.Delete(ctx, scope, input.ID)
+	if err != nil {
+		return nil, types.DeleteAiSystemOutput{}, fmt.Errorf("cannot delete ai system: %w", err)
+	}
+
+	return nil, types.DeleteAiSystemOutput{
+		DeletedAiSystemID: input.ID,
+	}, nil
+}
+
+func (r *Resolver) PublishAiSystemListTool(ctx context.Context, req *mcp.CallToolRequest, input *types.PublishAiSystemListInput) (*mcp.CallToolResult, types.PublishAiSystemListOutput, error) {
+	scope, err := r.Authorize(ctx, input.OrganizationID, probo.ActionAiSystemPublish)
+	if err != nil {
+		return nil, types.PublishAiSystemListOutput{}, err
+	}
+
+	svc := r.proboSvc
+
+	document, documentVersion, err := svc.GeneratedDocuments.PublishAiSystemList(
+		ctx,
+		scope,
+		input.OrganizationID,
+		input.ApproverIds,
+		input.Minor,
+	)
+	if err != nil {
+		return nil, types.PublishAiSystemListOutput{}, fmt.Errorf("cannot publish ai system list: %w", err)
+	}
+
+	return nil, types.PublishAiSystemListOutput{
+		DocumentID:        document.ID,
+		DocumentVersionID: documentVersion.ID,
+	}, nil
+}

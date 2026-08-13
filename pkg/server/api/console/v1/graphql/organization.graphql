@@ -44,6 +44,14 @@ enum MembershipRole
   VIEWER @goEnum(value: "go.probo.inc/probo/pkg/coredata.MembershipRoleViewer")
   AUDITOR
     @goEnum(value: "go.probo.inc/probo/pkg/coredata.MembershipRoleAuditor")
+  COMPLIANCE_PORTAL_MANAGER
+    @goEnum(
+      value: "go.probo.inc/probo/pkg/coredata.MembershipRoleCompliancePortalManager"
+    )
+  COMPLIANCE_PORTAL_ACCESS_MANAGER
+    @goEnum(
+      value: "go.probo.inc/probo/pkg/coredata.MembershipRoleCompliancePortalAccessManager"
+    )
 }
 
 type Profile implements Node {
@@ -363,6 +371,17 @@ type Organization implements Node {
         orderBy: BusinessFunctionOrder
         filter: BusinessFunctionFilter
     ): BusinessFunctionConnection! @goField(forceResolver: true)
+
+    aiSystemsDocument: Document @goField(forceResolver: true)
+
+    aiSystems(
+        first: Int
+        after: CursorKey
+        last: Int
+        before: CursorKey
+        orderBy: AiSystemOrder
+        filter: AiSystemFilter
+    ): AiSystemConnection! @goField(forceResolver: true)
 
     processingActivities(
         first: Int

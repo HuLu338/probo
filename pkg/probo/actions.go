@@ -148,15 +148,14 @@ const (
 	ActionEvidenceDelete = "core:evidence:delete"
 
 	// Document actions
-	ActionDocumentGet               = "core:document:get"
-	ActionDocumentList              = "core:document:list"
-	ActionDocumentCreate            = "core:document:create"
-	ActionDocumentUpdate            = "core:document:update"
-	ActionDocumentDelete            = "core:document:delete"
-	ActionDocumentChangelogGenerate = "core:document:generate-changelog"
-	ActionDocumentArchive           = "core:document:archive"
-	ActionDocumentUnarchive         = "core:document:unarchive"
-	ActionDocumentDeleteDraft       = "core:document:delete-draft"
+	ActionDocumentGet         = "core:document:get"
+	ActionDocumentList        = "core:document:list"
+	ActionDocumentCreate      = "core:document:create"
+	ActionDocumentUpdate      = "core:document:update"
+	ActionDocumentDelete      = "core:document:delete"
+	ActionDocumentArchive     = "core:document:archive"
+	ActionDocumentUnarchive   = "core:document:unarchive"
+	ActionDocumentDeleteDraft = "core:document:delete-draft"
 
 	// DocumentVersion actions
 	ActionDocumentVersionGet             = "core:document-version:get"
@@ -251,6 +250,14 @@ const (
 	ActionBusinessFunctionUpdate  = "core:business-function:update"
 	ActionBusinessFunctionDelete  = "core:business-function:delete"
 	ActionBusinessFunctionPublish = "core:business-function:publish"
+
+	// AiSystem actions
+	ActionAiSystemGet     = "core:ai-system:get"
+	ActionAiSystemList    = "core:ai-system:list"
+	ActionAiSystemCreate  = "core:ai-system:create"
+	ActionAiSystemUpdate  = "core:ai-system:update"
+	ActionAiSystemDelete  = "core:ai-system:delete"
+	ActionAiSystemPublish = "core:ai-system:publish"
 
 	// ProcessingActivity actions
 	ActionProcessingActivityList    = "core:processing-activity:list"

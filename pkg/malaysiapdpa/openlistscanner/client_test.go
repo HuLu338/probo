@@ -160,6 +160,7 @@ func TestClientGetScanReport_DoesNotForwardAPIKeyThroughRedirect(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "HTTP 302")
+
 	select {
 	case <-redirectTargetReached:
 		assert.Fail(t, "redirect target must not receive the scanner API key request")

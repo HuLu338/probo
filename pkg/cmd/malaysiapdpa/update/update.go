@@ -183,12 +183,15 @@ func NewCmdUpdate(f *cmdutil.Factory) *cobra.Command {
 				if profile.DPOProfileID != nil {
 					input["dpoProfileId"] = *profile.DPOProfileID
 				}
+
 				if profile.DPOAppointedAt != nil {
 					input["dpoAppointedAt"] = profile.DPOAppointedAt.Format(time.RFC3339)
 				}
+
 				if profile.CommissionerNotifiedAt != nil && !flagClearCommissionerNotification {
 					input["commissionerNotifiedAt"] = profile.CommissionerNotifiedAt.Format(time.RFC3339)
 				}
+
 				if profile.CommissionerNotificationReference != nil && !flagClearCommissionerNotification {
 					input["commissionerNotificationReference"] = *profile.CommissionerNotificationReference
 				}
