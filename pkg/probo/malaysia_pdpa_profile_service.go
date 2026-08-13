@@ -144,6 +144,8 @@ func (s OrganizationService) GetMalaysiaPDPAProfile(
 			if errors.Is(err, coredata.ErrResourceNotFound) {
 				profile.OrganizationID = organizationID
 				profile.DPORequirementReasons = []string{}
+				profile.RuleVersion = malaysiapdpa.DPOAssessmentRuleVersion
+				profile.RuleSource = malaysiapdpa.DPOAssessmentRuleSource
 
 				return nil
 			}
@@ -191,6 +193,8 @@ func (s OrganizationService) UpdateMalaysiaPDPAProfile(
 		DPORequirementReasons:             dpoRequirementReasonStrings(assessment.Reasons),
 		AssessedByProfileID:               &req.AssessedByProfileID,
 		AssessedAt:                        &now,
+		RuleVersion:                       malaysiapdpa.DPOAssessmentRuleVersion,
+		RuleSource:                        malaysiapdpa.DPOAssessmentRuleSource,
 		DPOProfileID:                      req.DPOProfileID,
 		DPOAppointedAt:                    req.DPOAppointedAt,
 		CommissionerNotifiedAt:            req.CommissionerNotifiedAt,

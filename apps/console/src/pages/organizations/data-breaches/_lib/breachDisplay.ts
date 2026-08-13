@@ -64,6 +64,26 @@ export function getBreachDecisionBadgeVariant(decision: string): BadgeVariant {
   }
 }
 
+export function getDeadlineBadgeVariant(
+  completed: boolean,
+  due: boolean,
+  overdue: boolean,
+): BadgeVariant | null {
+  if (overdue) {
+    return "danger";
+  }
+
+  if (completed) {
+    return "success";
+  }
+
+  if (due) {
+    return "info";
+  }
+
+  return null;
+}
+
 export function getAllowedBreachStatusTransitions(
   status: MalaysiaPDPABreachStatus,
 ): MalaysiaPDPABreachStatus[] {

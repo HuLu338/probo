@@ -38,6 +38,9 @@ type (
 )
 
 const (
+	DPOAssessmentRuleVersion = "MY-PDPA-DPO-2025-06-01"
+	DPOAssessmentRuleSource  = "https://www.pdp.gov.my/ppdpv1/wp-content/uploads/2025/08/GP_DPO_ENG.pdf"
+
 	PersonalDataSubjectThreshold            int64                = 20_000
 	SensitiveDataSubjectThreshold           int64                = 10_000
 	DPORequirementReasonPersonalDataVolume  DPORequirementReason = "PERSONAL_DATA_VOLUME"

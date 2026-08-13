@@ -130,6 +130,7 @@ type MalaysiaPDPABreachIncident implements Node {
     commissionerConfirmationReceivedAt: Datetime
     commissionerConfirmationReference: String
     phasedInformationDueAt: Datetime
+    phasedInformationOverdue: Boolean!
     delayedNotificationReason: String
     delayedNotificationEvidence: String
     dataSubjectsNotificationDueAt: Datetime

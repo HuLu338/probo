@@ -35,12 +35,12 @@ import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFragment } from "react-relay";
 import { graphql, type RecordSourceSelectorProxy } from "relay-runtime";
-import { z } from "zod";
 
 import type { MalaysiaPDPAProfileForm_organization$key } from "#/__generated__/core/MalaysiaPDPAProfileForm_organization.graphql";
 import type { MalaysiaPDPAProfileForm_profile$key } from "#/__generated__/core/MalaysiaPDPAProfileForm_profile.graphql";
 import type { MalaysiaPDPAProfileFormUpdateMutation } from "#/__generated__/core/MalaysiaPDPAProfileFormUpdateMutation.graphql";
 import { useMutation } from "#/lib/relay/useMutation";
+import { z } from "#/lib/zod";
 
 const NO_DPO_PROFILE = "__none__";
 const MAX_REFERENCE_LENGTH = 1000;
@@ -54,6 +54,8 @@ const profileFragment = graphql`
     dpoRequirementReasons
     assessedByProfileId
     assessedAt
+    ruleVersion
+    ruleSource
     dpoProfileId
     dpoAppointedAt
     commissionerNotificationDueAt
@@ -261,6 +263,22 @@ export function MalaysiaPDPAProfileForm({
         <p className="text-xs text-txt-tertiary">
           {t("malaysiaPDPA.status.thresholdNote")}
         </p>
+
+        <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-txt-tertiary">
+          <span>
+            {t("malaysiaPDPA.status.ruleVersion", {
+              version: profile.ruleVersion,
+            })}
+          </span>
+          <a
+            className="underline"
+            href={profile.ruleSource}
+            rel="noreferrer"
+            target="_blank"
+          >
+            {t("malaysiaPDPA.status.ruleSource")}
+          </a>
+        </div>
 
         {profile.assessedAt && (
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-txt-tertiary">

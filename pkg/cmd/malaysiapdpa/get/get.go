@@ -44,6 +44,8 @@ query($id: ID!) {
         dpoRequirementReasons
         assessedByProfileId
         assessedAt
+        ruleVersion
+        ruleSource
         dpoProfileId
         dpoAppointedAt
         commissionerNotificationDueAt
@@ -69,6 +71,8 @@ type getResponse struct {
 			DPORequirementReasons             []string `json:"dpoRequirementReasons"`
 			AssessedByProfileID               *string  `json:"assessedByProfileId"`
 			AssessedAt                        *string  `json:"assessedAt"`
+			RuleVersion                       string   `json:"ruleVersion"`
+			RuleSource                        string   `json:"ruleSource"`
 			DPOProfileID                      *string  `json:"dpoProfileId"`
 			DPOAppointedAt                    *string  `json:"dpoAppointedAt"`
 			CommissionerNotificationDueAt     *string  `json:"commissionerNotificationDueAt"`
@@ -153,6 +157,8 @@ func NewCmdGet(f *cmdutil.Factory) *cobra.Command {
 			_, _ = fmt.Fprintf(out, "%s%t\n", label.Render("Regular systematic monitoring:"), profile.RegularSystematicMonitoring)
 			_, _ = fmt.Fprintf(out, "%s%t\n", label.Render("DPO required:"), profile.DPORequired)
 			_, _ = fmt.Fprintf(out, "%s%s\n", label.Render("DPO reasons:"), strings.Join(profile.DPORequirementReasons, ", "))
+			_, _ = fmt.Fprintf(out, "%s%s\n", label.Render("Rule version:"), profile.RuleVersion)
+			_, _ = fmt.Fprintf(out, "%s%s\n", label.Render("Rule source:"), profile.RuleSource)
 
 			if profile.AssessedAt != nil {
 				_, _ = fmt.Fprintf(out, "%s%s\n", label.Render("Assessed at:"), cmdutil.FormatTime(*profile.AssessedAt))

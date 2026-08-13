@@ -143,6 +143,7 @@ func NewMalaysiaPDPABreachIncident(incident *coredata.MalaysiaPDPABreachIncident
 		CommissionerConfirmationReceivedAt: incident.CommissionerConfirmationReceivedAt,
 		CommissionerConfirmationReference:  incident.CommissionerConfirmationReference,
 		PhasedInformationDueAt:             assessment.PhasedInformationDueAt,
+		PhasedInformationOverdue:           deadlineOverdue(assessment.PhasedInformationDueAt, incident.CommissionerConfirmationReceivedAt),
 		DelayedNotificationReason:          incident.DelayedNotificationReason,
 		DelayedNotificationEvidence:        incident.DelayedNotificationEvidence,
 		DataSubjectsNotificationDueAt:      assessment.DataSubjectNotificationDueAt,

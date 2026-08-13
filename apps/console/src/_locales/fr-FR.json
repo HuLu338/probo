@@ -773,6 +773,7 @@
       "description": "Contexte en lecture seule enregistré lors de l’ingestion de ce constat.",
       "source": "Source du scanner",
       "ruleVersion": "Version de la règle",
+      "ruleSource": "Source de la règle",
       "evidence": "Preuves"
     },
     "actions": {

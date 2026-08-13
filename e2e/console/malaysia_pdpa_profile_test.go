@@ -43,6 +43,8 @@ const (
 						dpoRequirementReasons
 						assessedByProfileId
 						assessedAt
+						ruleVersion
+						ruleSource
 						dpoProfileId
 						dpoAppointedAt
 						commissionerNotificationDueAt
@@ -69,6 +71,8 @@ const (
 					dpoRequirementReasons
 					assessedByProfileId
 					assessedAt
+					ruleVersion
+					ruleSource
 					dpoProfileId
 					dpoAppointedAt
 					commissionerNotificationDueAt
@@ -92,6 +96,8 @@ type malaysiaPDPAProfileResult struct {
 	DPORequirementReasons             []string   `json:"dpoRequirementReasons"`
 	AssessedByProfileID               *string    `json:"assessedByProfileId"`
 	AssessedAt                        *time.Time `json:"assessedAt"`
+	RuleVersion                       string     `json:"ruleVersion"`
+	RuleSource                        string     `json:"ruleSource"`
 	DPOProfileID                      *string    `json:"dpoProfileId"`
 	DPOAppointedAt                    *time.Time `json:"dpoAppointedAt"`
 	CommissionerNotificationDueAt     *time.Time `json:"commissionerNotificationDueAt"`
@@ -150,6 +156,8 @@ func TestMalaysiaPDPAProfile_UpdateAssessment(t *testing.T) {
 	)
 	require.NotNil(t, profile.AssessedByProfileID)
 	assert.Equal(t, owner.GetProfileID().String(), *profile.AssessedByProfileID)
+	assert.Equal(t, "MY-PDPA-DPO-2025-06-01", profile.RuleVersion)
+	assert.Equal(t, "https://www.pdp.gov.my/ppdpv1/wp-content/uploads/2025/08/GP_DPO_ENG.pdf", profile.RuleSource)
 	require.NotNil(t, profile.DPOProfileID)
 	assert.Equal(t, owner.GetProfileID().String(), *profile.DPOProfileID)
 	require.NotNil(t, profile.CommissionerNotificationDueAt)

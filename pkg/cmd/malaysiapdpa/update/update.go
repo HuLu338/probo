@@ -54,6 +54,8 @@ mutation($input: UpdateMalaysiaPDPAProfileInput!) {
       dpoRequired
       dpoRequirementReasons
       assessedAt
+      ruleVersion
+      ruleSource
     }
   }
 }
@@ -79,6 +81,8 @@ type (
 				DPORequired           bool     `json:"dpoRequired"`
 				DPORequirementReasons []string `json:"dpoRequirementReasons"`
 				AssessedAt            string   `json:"assessedAt"`
+				RuleVersion           string   `json:"ruleVersion"`
+				RuleSource            string   `json:"ruleSource"`
 			} `json:"malaysiaPDPAProfile"`
 		} `json:"updateMalaysiaPDPAProfile"`
 	}

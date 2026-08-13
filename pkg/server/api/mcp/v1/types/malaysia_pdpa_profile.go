@@ -63,6 +63,8 @@ func NewMalaysiaPDPAProfile(p *coredata.MalaysiaPDPAProfile) *MalaysiaPDPAProfil
 		DpoRequirementReasons:             reasons,
 		OrganizationID:                    p.OrganizationID,
 		RegularSystematicMonitoring:       p.RegularSystematicMonitoring,
+		RuleSource:                        p.RuleSource,
+		RuleVersion:                       p.RuleVersion,
 		SensitiveDataSubjects:             int(p.SensitiveDataSubjects),
 		TotalDataSubjects:                 int(p.TotalDataSubjects),
 		UpdatedAt:                         updatedAt,

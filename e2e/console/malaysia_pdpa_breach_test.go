@@ -43,6 +43,7 @@ const (
 		commissionerNotificationDueAt
 		commissionerNotifiedAt
 		phasedInformationDueAt
+		phasedInformationOverdue
 		dataSubjectsNotificationDueAt
 		status
 		createdAt
@@ -107,6 +108,7 @@ type malaysiaPDPABreachResult struct {
 	CommissionerNotificationDueAt *time.Time `json:"commissionerNotificationDueAt"`
 	CommissionerNotifiedAt        *time.Time `json:"commissionerNotifiedAt"`
 	PhasedInformationDueAt        *time.Time `json:"phasedInformationDueAt"`
+	PhasedInformationOverdue      bool       `json:"phasedInformationOverdue"`
 	DataSubjectsNotificationDueAt *time.Time `json:"dataSubjectsNotificationDueAt"`
 	Status                        string     `json:"status"`
 	CreatedAt                     time.Time  `json:"createdAt"`
@@ -230,6 +232,37 @@ func TestMalaysiaPDPABreach_StatusHistoryIsAppended(t *testing.T) {
 	})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "to_status")
+}
+
+func TestMalaysiaPDPABreach_PhasedInformationOverdue(t *testing.T) {
+	t.Parallel()
+
+	owner := testutil.NewClient(t, testutil.RoleOwner)
+	awarenessAt := time.Date(2000, time.January, 1, 12, 0, 0, 0, time.UTC)
+	commissionerNotifiedAt := awarenessAt.Add(24 * time.Hour)
+	incident := createMalaysiaPDPABreach(t, owner, map[string]any{
+		"organizationId":                    owner.GetOrganizationID().String(),
+		"title":                             "Phased information overdue",
+		"discoveredAt":                      awarenessAt.Add(-time.Hour).Format(time.RFC3339),
+		"awarenessAt":                       awarenessAt.Format(time.RFC3339),
+		"affectedDataSubjects":              1_001,
+		"affectedDataRecords":               1_001,
+		"personalDataTypes":                 "Names and email addresses",
+		"potentialPhysicalHarm":             false,
+		"potentialFinancialLoss":            false,
+		"potentialCreditOrPropertyDamage":   false,
+		"potentialIllegalUse":               false,
+		"sensitivePersonalData":             false,
+		"potentialIdentityFraud":            false,
+		"notificationDecision":              "COMMISSIONER_ONLY",
+		"decisionRationale":                 "Significant scale requires Commissioner notification.",
+		"commissionerNotifiedAt":            commissionerNotifiedAt.Format(time.RFC3339),
+		"commissionerNotificationReference": "DBN-PHASED-OVERDUE",
+	})
+
+	require.NotNil(t, incident.PhasedInformationDueAt)
+	assert.Equal(t, commissionerNotifiedAt.Add(30*24*time.Hour), *incident.PhasedInformationDueAt)
+	assert.True(t, incident.PhasedInformationOverdue)
 }
 
 func TestMalaysiaPDPABreach_RBACAndTenantIsolation(t *testing.T) {

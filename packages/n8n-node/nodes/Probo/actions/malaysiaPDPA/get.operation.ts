@@ -57,6 +57,8 @@ export async function execute(
 						dpoRequirementReasons
 						assessedByProfileId
 						assessedAt
+						ruleVersion
+						ruleSource
 						dpoProfileId
 						dpoAppointedAt
 						commissionerNotificationDueAt

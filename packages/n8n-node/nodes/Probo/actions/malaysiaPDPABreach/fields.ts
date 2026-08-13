@@ -57,6 +57,7 @@ export const incidentFields = `
 	commissionerConfirmationReceivedAt
 	commissionerConfirmationReference
 	phasedInformationDueAt
+	phasedInformationOverdue
 	delayedNotificationReason
 	delayedNotificationEvidence
 	dataSubjectsNotificationDueAt

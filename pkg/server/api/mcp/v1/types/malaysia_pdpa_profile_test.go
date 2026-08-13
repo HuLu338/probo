@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.probo.inc/probo/pkg/coredata"
+	"go.probo.inc/probo/pkg/malaysiapdpa"
 	"go.probo.inc/probo/pkg/server/api/mcp/v1/types"
 )
 
@@ -68,11 +69,15 @@ func TestNewMalaysiaPDPAProfile_CommissionerNotificationOverdue(t *testing.T) {
 				profile := types.NewMalaysiaPDPAProfile(&coredata.MalaysiaPDPAProfile{
 					DPOAppointedAt:         &dpoAppointedAt,
 					CommissionerNotifiedAt: tt.commissionerNotifiedAt,
+					RuleVersion:            malaysiapdpa.DPOAssessmentRuleVersion,
+					RuleSource:             malaysiapdpa.DPOAssessmentRuleSource,
 				})
 
 				require.NotNil(t, profile.CommissionerNotificationDueAt)
 				assert.Equal(t, commissionerNotificationDueAt, *profile.CommissionerNotificationDueAt)
 				assert.Equal(t, tt.expectedNotificationOverdue, profile.CommissionerNotificationOverdue)
+				assert.Equal(t, malaysiapdpa.DPOAssessmentRuleVersion, profile.RuleVersion)
+				assert.Equal(t, malaysiapdpa.DPOAssessmentRuleSource, profile.RuleSource)
 			},
 		)
 	}

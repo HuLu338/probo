@@ -26,7 +26,10 @@ import { graphql, useFragment } from "react-relay";
 
 import type { MalaysiaPDPABreachSummarySection_incident$key } from "#/__generated__/core/MalaysiaPDPABreachSummarySection_incident.graphql";
 
-import { getBreachDecisionBadgeVariant } from "../_lib/breachDisplay";
+import {
+  getBreachDecisionBadgeVariant,
+  getDeadlineBadgeVariant,
+} from "../_lib/breachDisplay";
 
 const incidentFragment = graphql`
   fragment MalaysiaPDPABreachSummarySection_incident on MalaysiaPDPABreachIncident {
@@ -47,6 +50,7 @@ const incidentFragment = graphql`
     commissionerConfirmationReceivedAt
     commissionerConfirmationReference
     phasedInformationDueAt
+    phasedInformationOverdue
     dataSubjectsNotificationDueAt
     dataSubjectsNotificationOverdue
     dataSubjectsNotifiedAt
@@ -119,7 +123,7 @@ export function MalaysiaPDPABreachSummarySection({
           label={t("deadlines.phasedInformation")}
           dueAt={incident.phasedInformationDueAt}
           completedAt={incident.commissionerConfirmationReceivedAt}
-          overdue={false}
+          overdue={incident.phasedInformationOverdue}
         />
         <DeadlineBlock
           label={t("deadlines.dataSubjects")}
@@ -209,12 +213,22 @@ function DeadlineBlock({
 
   if (completedAt) {
     content = dateTimeFormat(i18n.language, completedAt);
-    badge = <Badge variant="success">{t("deadlines.completed")}</Badge>;
   } else if (dueAt) {
     content = dateTimeFormat(i18n.language, dueAt);
-    badge = overdue
-      ? <Badge variant="danger">{t("deadlines.overdue")}</Badge>
-      : <Badge variant="info">{t("deadlines.pending")}</Badge>;
+  }
+
+  const badgeVariant = getDeadlineBadgeVariant(
+    Boolean(completedAt),
+    Boolean(dueAt),
+    overdue,
+  );
+  if (badgeVariant) {
+    const badgeLabel = overdue
+      ? t("deadlines.overdue")
+      : completedAt
+        ? t("deadlines.completed")
+        : t("deadlines.pending");
+    badge = <Badge variant={badgeVariant}>{badgeLabel}</Badge>;
   }
 
   return (
