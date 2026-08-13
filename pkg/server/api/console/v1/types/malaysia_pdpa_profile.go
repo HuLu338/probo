@@ -58,6 +58,8 @@ func NewMalaysiaPDPAProfile(p *coredata.MalaysiaPDPAProfile) *MalaysiaPDPAProfil
 		DPORequirementReasons:             reasons,
 		AssessedByProfileID:               p.AssessedByProfileID,
 		AssessedAt:                        p.AssessedAt,
+		RuleVersion:                       p.RuleVersion,
+		RuleSource:                        p.RuleSource,
 		DPOProfileID:                      p.DPOProfileID,
 		DPOAppointedAt:                    p.DPOAppointedAt,
 		CommissionerNotificationDueAt:     commissionerNotificationDueAt,

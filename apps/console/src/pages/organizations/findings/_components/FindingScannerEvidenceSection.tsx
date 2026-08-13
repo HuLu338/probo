@@ -29,6 +29,7 @@ const findingFragment = graphql`
     malaysiaPDPAScannerFinding {
       source
       ruleVersion
+      ruleSource
       evidence
     }
   }
@@ -60,7 +61,7 @@ export function FindingScannerEvidenceSection({
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <MetadataBlock
           label={t("findingDetails.scannerEvidence.source")}
           value={scannerFinding.source}
@@ -68,6 +69,11 @@ export function FindingScannerEvidenceSection({
         <MetadataBlock
           label={t("findingDetails.scannerEvidence.ruleVersion")}
           value={scannerFinding.ruleVersion}
+        />
+        <MetadataBlock
+          href={scannerFinding.ruleSource}
+          label={t("findingDetails.scannerEvidence.ruleSource")}
+          value={scannerFinding.ruleSource}
         />
       </div>
 
@@ -84,15 +90,27 @@ export function FindingScannerEvidenceSection({
 }
 
 interface MetadataBlockProps {
+  href?: string;
   label: string;
   value: string;
 }
 
-function MetadataBlock({ label, value }: MetadataBlockProps) {
+function MetadataBlock({ href, label, value }: MetadataBlockProps) {
   return (
     <div className="space-y-1 rounded-xl border border-border-low p-4">
       <p className="text-xs font-medium text-txt-tertiary">{label}</p>
-      <p className="break-words text-sm text-txt-secondary">{value}</p>
+      {href
+        ? (
+            <a
+              className="break-words text-sm text-txt-secondary underline"
+              href={href}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {value}
+            </a>
+          )
+        : <p className="break-words text-sm text-txt-secondary">{value}</p>}
     </div>
   );
 }

@@ -67,6 +67,7 @@ const incidentFields = `
   commissionerConfirmationReceivedAt
   commissionerConfirmationReference
   phasedInformationDueAt
+  phasedInformationOverdue
   delayedNotificationReason
   delayedNotificationEvidence
   dataSubjectsNotificationDueAt
@@ -171,6 +172,7 @@ type incident struct {
 	CommissionerConfirmationReceivedAt *string  `json:"commissionerConfirmationReceivedAt"`
 	CommissionerConfirmationReference  *string  `json:"commissionerConfirmationReference"`
 	PhasedInformationDueAt             *string  `json:"phasedInformationDueAt"`
+	PhasedInformationOverdue           bool     `json:"phasedInformationOverdue"`
 	DelayedNotificationReason          *string  `json:"delayedNotificationReason"`
 	DelayedNotificationEvidence        *string  `json:"delayedNotificationEvidence"`
 	DataSubjectsNotificationDueAt      *string  `json:"dataSubjectsNotificationDueAt"`

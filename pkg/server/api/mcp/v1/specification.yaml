@@ -9441,6 +9441,8 @@ components:
         - regular_systematic_monitoring
         - dpo_required
         - dpo_requirement_reasons
+        - rule_version
+        - rule_source
         - commissioner_notification_overdue
       properties:
         organization_id:
@@ -9472,6 +9474,12 @@ components:
           type: string
           format: date-time
           description: Latest assessment time
+        rule_version:
+          type: string
+          description: Version of the Malaysia DPO assessment rules used by the server
+        rule_source:
+          type: string
+          description: Official source for the Malaysia DPO assessment rules
         dpo_profile_id:
           $ref: "#/components/schemas/GID"
           description: Appointed DPO membership profile
@@ -9640,6 +9648,7 @@ components:
         - rule_version
         - rule_source
         - commissioner_notification_overdue
+        - phased_information_overdue
         - data_subjects_notification_overdue
         - status
         - created_by_profile_id
@@ -9732,6 +9741,8 @@ components:
         phased_information_due_at:
           type: ["string", "null"]
           format: date-time
+        phased_information_overdue:
+          type: boolean
         delayed_notification_reason:
           type: ["string", "null"]
         delayed_notification_evidence:

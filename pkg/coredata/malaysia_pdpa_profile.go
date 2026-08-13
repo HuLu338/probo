@@ -42,6 +42,8 @@ type (
 		DPORequirementReasons             []string   `db:"dpo_requirement_reasons"`
 		AssessedByProfileID               *gid.GID   `db:"assessed_by_profile_id"`
 		AssessedAt                        *time.Time `db:"assessed_at"`
+		RuleVersion                       string     `db:"rule_version"`
+		RuleSource                        string     `db:"rule_source"`
 		DPOProfileID                      *gid.GID   `db:"dpo_profile_id"`
 		DPOAppointedAt                    *time.Time `db:"dpo_appointed_at"`
 		CommissionerNotifiedAt            *time.Time `db:"commissioner_notified_at"`
@@ -67,6 +69,8 @@ SELECT
     dpo_requirement_reasons,
     assessed_by_profile_id,
     assessed_at,
+    rule_version,
+    rule_source,
     dpo_profile_id,
     dpo_appointed_at,
     commissioner_notified_at,
@@ -117,6 +121,8 @@ INSERT INTO malaysia_pdpa_profiles (
     dpo_requirement_reasons,
     assessed_by_profile_id,
     assessed_at,
+    rule_version,
+    rule_source,
     dpo_profile_id,
     dpo_appointed_at,
     commissioner_notified_at,
@@ -133,6 +139,8 @@ INSERT INTO malaysia_pdpa_profiles (
     @dpo_requirement_reasons,
     @assessed_by_profile_id,
     @assessed_at,
+    @rule_version,
+    @rule_source,
     @dpo_profile_id,
     @dpo_appointed_at,
     @commissioner_notified_at,
@@ -149,6 +157,8 @@ SET
     dpo_requirement_reasons = EXCLUDED.dpo_requirement_reasons,
     assessed_by_profile_id = EXCLUDED.assessed_by_profile_id,
     assessed_at = EXCLUDED.assessed_at,
+    rule_version = EXCLUDED.rule_version,
+    rule_source = EXCLUDED.rule_source,
     dpo_profile_id = EXCLUDED.dpo_profile_id,
     dpo_appointed_at = EXCLUDED.dpo_appointed_at,
     commissioner_notified_at = EXCLUDED.commissioner_notified_at,
@@ -166,6 +176,8 @@ SET
 		"dpo_requirement_reasons":             p.DPORequirementReasons,
 		"assessed_by_profile_id":              p.AssessedByProfileID,
 		"assessed_at":                         p.AssessedAt,
+		"rule_version":                        p.RuleVersion,
+		"rule_source":                         p.RuleSource,
 		"dpo_profile_id":                      p.DPOProfileID,
 		"dpo_appointed_at":                    p.DPOAppointedAt,
 		"commissioner_notified_at":            p.CommissionerNotifiedAt,

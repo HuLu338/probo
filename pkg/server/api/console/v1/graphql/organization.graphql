@@ -150,6 +150,8 @@ type MalaysiaPDPAProfile {
         @goField(name: "DPORequirementReasons")
     assessedByProfileId: ID
     assessedAt: Datetime
+    ruleVersion: String!
+    ruleSource: String!
     dpoProfileId: ID @goField(name: "DPOProfileID")
     dpoAppointedAt: Datetime @goField(name: "DPOAppointedAt")
     commissionerNotificationDueAt: Datetime
