@@ -318,7 +318,7 @@ cfg/dev.yaml: bin/probod-bootstrap $(CFG_DEV_OAUTH2_KEY) $(CFG_DEV_ACME_ACCOUNT_
 	PROBOD_ACME_KEY_TYPE=EC256; \
 	PROBOD_ACME_ACCOUNT_KEY="$$($(CAT) $(CFG_DEV_ACME_ACCOUNT_KEY))"; \
 	PROBOD_ACME_ROOT_CA="$$($(CAT) compose/step-ca/certs/root_ca.crt)"; \
-	if [ -f $(DEV_ENV) ]; then . $(DEV_ENV); fi; \
+	if [ -f $(DEV_ENV) ]; then . ./$(DEV_ENV); fi; \
 	set +a; \
 	./bin/probod-bootstrap -output $@
 
