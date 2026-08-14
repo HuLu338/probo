@@ -149,7 +149,7 @@ func TestThirdPartyRiskAssessment_CreateAndList(t *testing.T) {
 
 	assert.NotEmpty(t, created.ID)
 	assert.Equal(t, thirdPartyID, created.ThirdParty.ID)
-	assert.Equal(t, expectedExpiresAt, created.ExpiresAt)
+	assert.WithinDuration(t, expectedExpiresAt, created.ExpiresAt, 0)
 	assert.Equal(t, dataSensitivity, created.DataSensitivity)
 	assert.Equal(t, businessImpact, created.BusinessImpact)
 	require.NotNil(t, created.Notes)
@@ -204,7 +204,7 @@ func TestThirdPartyRiskAssessment_CreateAndList(t *testing.T) {
 	listed := listResult.Node.RiskAssessments.Edges[0].Node
 	assert.Equal(t, created.ID, listed.ID)
 	assert.Equal(t, thirdPartyID, listed.ThirdParty.ID)
-	assert.Equal(t, expectedExpiresAt, listed.ExpiresAt)
+	assert.WithinDuration(t, expectedExpiresAt, listed.ExpiresAt, 0)
 	assert.Equal(t, dataSensitivity, listed.DataSensitivity)
 	assert.Equal(t, businessImpact, listed.BusinessImpact)
 	require.NotNil(t, listed.Notes)

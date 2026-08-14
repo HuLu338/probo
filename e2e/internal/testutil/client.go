@@ -560,21 +560,9 @@ func (c *Client) pollForLinkToken(searchQuery string) string {
 	deadline := time.Now().Add(10 * time.Second)
 
 	for time.Now().Before(deadline) {
-		searchMails, err := c.SearchMails(searchQuery)
-		require.NoError(c.T, err, "mailpit messages search failed")
-
-		for _, msg := range searchMails.Messages {
-			linksCheck, err := c.CheckMessageLinks(msg.ResolvedID())
-			require.NoError(c.T, err, "mailpit link check failed")
-
-			for _, link := range linksCheck.Links {
-				linkURL, err := url.Parse(link.URL)
-				require.NoError(c.T, err, "mailpit link invalid URL")
-
-				if token := linkURL.Query().Get("token"); token != "" {
-					return token
-				}
-			}
+		token, err := c.FindTokenFromMailpitSearch(searchQuery)
+		if err == nil {
+			return token
 		}
 
 		time.Sleep(100 * time.Millisecond)

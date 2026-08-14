@@ -203,7 +203,7 @@ func (s *TransferImpactAssessmentService) Create(
 		return nil, err
 	}
 
-	now := time.Now()
+	now := time.Now().Truncate(time.Microsecond)
 
 	tia := &coredata.TransferImpactAssessment{
 		ID:                    gid.New(scope.GetTenantID(), coredata.TransferImpactAssessmentEntityType),
@@ -295,7 +295,7 @@ func (s *TransferImpactAssessmentService) Update(
 				}
 			}
 
-			tia.UpdatedAt = time.Now()
+			tia.UpdatedAt = time.Now().Truncate(time.Microsecond)
 
 			if err := tia.Update(ctx, conn, scope); err != nil {
 				return fmt.Errorf("cannot update transfer impact assessment: %w", err)
@@ -403,7 +403,7 @@ func applyMalaysiaPDPATransfer(
 			return err
 		}
 
-		now := time.Now()
+		now := time.Now().Truncate(time.Microsecond)
 		approvedByProfileID = &req.ApprovedByProfileID
 
 		reviewedAt = &now

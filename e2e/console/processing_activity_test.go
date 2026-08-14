@@ -1071,6 +1071,15 @@ func TestProcessingActivity_DPIA(t *testing.T) {
 						potentialRisk
 						mitigations
 						residualRisk
+						createdAt
+						updatedAt
+						processingActivity {
+							dataProtectionImpactAssessment {
+								id
+								createdAt
+								updatedAt
+							}
+						}
 					}
 				}
 			}
@@ -1085,6 +1094,15 @@ func TestProcessingActivity_DPIA(t *testing.T) {
 					PotentialRisk               *string `json:"potentialRisk"`
 					Mitigations                 *string `json:"mitigations"`
 					ResidualRisk                *string `json:"residualRisk"`
+					CreatedAt                   string  `json:"createdAt"`
+					UpdatedAt                   string  `json:"updatedAt"`
+					ProcessingActivity          struct {
+						DataProtectionImpactAssessment struct {
+							ID        string `json:"id"`
+							CreatedAt string `json:"createdAt"`
+							UpdatedAt string `json:"updatedAt"`
+						} `json:"dataProtectionImpactAssessment"`
+					} `json:"processingActivity"`
 				} `json:"dataProtectionImpactAssessment"`
 			} `json:"createDataProtectionImpactAssessment"`
 		}
@@ -1100,9 +1118,13 @@ func TestProcessingActivity_DPIA(t *testing.T) {
 			},
 		}, &result)
 		require.NoError(t, err)
-		assert.NotEmpty(t, result.CreateDataProtectionImpactAssessment.DataProtectionImpactAssessment.ID)
-		assert.Equal(t, "Test DPIA description", *result.CreateDataProtectionImpactAssessment.DataProtectionImpactAssessment.Description)
-		assert.Equal(t, "LOW", *result.CreateDataProtectionImpactAssessment.DataProtectionImpactAssessment.ResidualRisk)
+		dpia := result.CreateDataProtectionImpactAssessment.DataProtectionImpactAssessment
+		assert.NotEmpty(t, dpia.ID)
+		assert.Equal(t, "Test DPIA description", *dpia.Description)
+		assert.Equal(t, "LOW", *dpia.ResidualRisk)
+		assert.Equal(t, dpia.ID, dpia.ProcessingActivity.DataProtectionImpactAssessment.ID)
+		assert.Equal(t, dpia.CreatedAt, dpia.ProcessingActivity.DataProtectionImpactAssessment.CreatedAt)
+		assert.Equal(t, dpia.UpdatedAt, dpia.ProcessingActivity.DataProtectionImpactAssessment.UpdatedAt)
 	})
 
 	t.Run("read DPIA via processing activity", func(t *testing.T) {
@@ -1362,6 +1384,15 @@ func TestProcessingActivity_TIA(t *testing.T) {
 						transfer
 						localLawRisk
 						supplementaryMeasures
+						createdAt
+						updatedAt
+						processingActivity {
+							transferImpactAssessment {
+								id
+								createdAt
+								updatedAt
+							}
+						}
 					}
 				}
 			}
@@ -1376,6 +1407,15 @@ func TestProcessingActivity_TIA(t *testing.T) {
 					Transfer              *string `json:"transfer"`
 					LocalLawRisk          *string `json:"localLawRisk"`
 					SupplementaryMeasures *string `json:"supplementaryMeasures"`
+					CreatedAt             string  `json:"createdAt"`
+					UpdatedAt             string  `json:"updatedAt"`
+					ProcessingActivity    struct {
+						TransferImpactAssessment struct {
+							ID        string `json:"id"`
+							CreatedAt string `json:"createdAt"`
+							UpdatedAt string `json:"updatedAt"`
+						} `json:"transferImpactAssessment"`
+					} `json:"processingActivity"`
 				} `json:"transferImpactAssessment"`
 			} `json:"createTransferImpactAssessment"`
 		}
@@ -1391,9 +1431,13 @@ func TestProcessingActivity_TIA(t *testing.T) {
 			},
 		}, &result)
 		require.NoError(t, err)
-		assert.NotEmpty(t, result.CreateTransferImpactAssessment.TransferImpactAssessment.ID)
-		assert.Equal(t, "EU customers", *result.CreateTransferImpactAssessment.TransferImpactAssessment.DataSubjects)
-		assert.Equal(t, "Standard Contractual Clauses", *result.CreateTransferImpactAssessment.TransferImpactAssessment.LegalMechanism)
+		tia := result.CreateTransferImpactAssessment.TransferImpactAssessment
+		assert.NotEmpty(t, tia.ID)
+		assert.Equal(t, "EU customers", *tia.DataSubjects)
+		assert.Equal(t, "Standard Contractual Clauses", *tia.LegalMechanism)
+		assert.Equal(t, tia.ID, tia.ProcessingActivity.TransferImpactAssessment.ID)
+		assert.Equal(t, tia.CreatedAt, tia.ProcessingActivity.TransferImpactAssessment.CreatedAt)
+		assert.Equal(t, tia.UpdatedAt, tia.ProcessingActivity.TransferImpactAssessment.UpdatedAt)
 	})
 
 	t.Run("read TIA via processing activity", func(t *testing.T) {

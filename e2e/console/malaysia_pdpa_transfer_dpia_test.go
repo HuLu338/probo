@@ -58,10 +58,23 @@ const (
 					malaysiaApprovalStatus
 					malaysiaApprovedByProfileId
 					malaysiaReviewedAt
+					reviewedAtRaw: malaysiaReviewedAt
 					malaysiaNextReviewAt
+					nextReviewAtRaw: malaysiaNextReviewAt
 					malaysiaReviewEvidence
 					malaysiaRuleVersion
 					malaysiaRuleSource
+					createdAt
+					updatedAt
+					processingActivity {
+						transferImpactAssessment {
+							id
+							malaysiaReviewedAt
+							malaysiaNextReviewAt
+							createdAt
+							updatedAt
+						}
+					}
 				}
 			}
 		}
@@ -86,10 +99,23 @@ type malaysiaPDPATransferResult struct {
 	ApprovalStatus        *string    `json:"malaysiaApprovalStatus"`
 	ApprovedByProfileID   *string    `json:"malaysiaApprovedByProfileId"`
 	ReviewedAt            *time.Time `json:"malaysiaReviewedAt"`
+	ReviewedAtRaw         *string    `json:"reviewedAtRaw"`
 	NextReviewAt          *time.Time `json:"malaysiaNextReviewAt"`
+	NextReviewAtRaw       *string    `json:"nextReviewAtRaw"`
 	ReviewEvidence        *string    `json:"malaysiaReviewEvidence"`
 	RuleVersion           *string    `json:"malaysiaRuleVersion"`
 	RuleSource            *string    `json:"malaysiaRuleSource"`
+	CreatedAt             string     `json:"createdAt"`
+	UpdatedAt             string     `json:"updatedAt"`
+	ProcessingActivity    struct {
+		TransferImpactAssessment *struct {
+			ID           string  `json:"id"`
+			ReviewedAt   *string `json:"malaysiaReviewedAt"`
+			NextReviewAt *string `json:"malaysiaNextReviewAt"`
+			CreatedAt    string  `json:"createdAt"`
+			UpdatedAt    string  `json:"updatedAt"`
+		} `json:"transferImpactAssessment"`
+	} `json:"processingActivity"`
 }
 
 func TestMalaysiaPDPADPIAScreening_QuantitativeAndQualitativeCriteria(t *testing.T) {
@@ -153,6 +179,15 @@ func TestMalaysiaPDPATransfer_ApprovalAndThreeYearReview(t *testing.T) {
 	require.NotNil(t, transfer.ReviewedAt)
 	require.NotNil(t, transfer.NextReviewAt)
 	assert.Equal(t, transfer.ReviewedAt.AddDate(3, 0, 0), *transfer.NextReviewAt)
+	require.NotNil(t, transfer.ReviewedAtRaw)
+	require.NotNil(t, transfer.NextReviewAtRaw)
+	require.NotNil(t, transfer.ProcessingActivity.TransferImpactAssessment)
+	nestedTransfer := transfer.ProcessingActivity.TransferImpactAssessment
+	assert.Equal(t, transfer.ID, nestedTransfer.ID)
+	assert.Equal(t, transfer.ReviewedAtRaw, nestedTransfer.ReviewedAt)
+	assert.Equal(t, transfer.NextReviewAtRaw, nestedTransfer.NextReviewAt)
+	assert.Equal(t, transfer.CreatedAt, nestedTransfer.CreatedAt)
+	assert.Equal(t, transfer.UpdatedAt, nestedTransfer.UpdatedAt)
 	require.NotNil(t, transfer.RuleVersion)
 	assert.Equal(t, "MY-PDPA-CBPDT-2025-04-29", *transfer.RuleVersion)
 	require.NotNil(t, transfer.RuleSource)
