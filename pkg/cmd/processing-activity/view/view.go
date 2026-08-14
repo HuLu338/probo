@@ -23,6 +23,7 @@ package view
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
@@ -40,6 +41,22 @@ query($id: ID!) {
       purpose
       role
       lawfulBasis
+      malaysiaPDPADPIATotalDataSubjects
+      malaysiaPDPADPIASensitiveDataSubjects
+      malaysiaPDPADPIALegalOrSignificantEffects
+      malaysiaPDPADPIASystematicMonitoring
+      malaysiaPDPADPIAInnovativeTechnology
+      malaysiaPDPADPIADenialOrRestrictionOfRights
+      malaysiaPDPADPIALocationOrBehaviourTracking
+      malaysiaPDPADPIAChildrenOrVulnerableDataSubjects
+      malaysiaPDPADPIAHighRiskAutomatedDecisionMaking
+      malaysiaPDPADPIAOtherHighRiskFactors
+      malaysiaPDPADPIARecommendation
+      malaysiaPDPADPIAReasons
+      malaysiaPDPADPIAAssessedByProfileId
+      malaysiaPDPADPIAAssessedAt
+      malaysiaPDPADPIARuleVersion
+      malaysiaPDPADPIARuleSource
       createdAt
       updatedAt
     }
@@ -49,14 +66,30 @@ query($id: ID!) {
 
 type viewResponse struct {
 	Node *struct {
-		Typename    string  `json:"__typename"`
-		ID          string  `json:"id"`
-		Name        string  `json:"name"`
-		Purpose     *string `json:"purpose"`
-		Role        string  `json:"role"`
-		LawfulBasis string  `json:"lawfulBasis"`
-		CreatedAt   string  `json:"createdAt"`
-		UpdatedAt   string  `json:"updatedAt"`
+		Typename                                         string   `json:"__typename"`
+		ID                                               string   `json:"id"`
+		Name                                             string   `json:"name"`
+		Purpose                                          *string  `json:"purpose"`
+		Role                                             string   `json:"role"`
+		LawfulBasis                                      string   `json:"lawfulBasis"`
+		MalaysiaPDPADPIATotalDataSubjects                int64    `json:"malaysiaPDPADPIATotalDataSubjects"`
+		MalaysiaPDPADPIASensitiveDataSubjects            int64    `json:"malaysiaPDPADPIASensitiveDataSubjects"`
+		MalaysiaPDPADPIALegalOrSignificantEffects        bool     `json:"malaysiaPDPADPIALegalOrSignificantEffects"`
+		MalaysiaPDPADPIASystematicMonitoring             bool     `json:"malaysiaPDPADPIASystematicMonitoring"`
+		MalaysiaPDPADPIAInnovativeTechnology             bool     `json:"malaysiaPDPADPIAInnovativeTechnology"`
+		MalaysiaPDPADPIADenialOrRestrictionOfRights      bool     `json:"malaysiaPDPADPIADenialOrRestrictionOfRights"`
+		MalaysiaPDPADPIALocationOrBehaviourTracking      bool     `json:"malaysiaPDPADPIALocationOrBehaviourTracking"`
+		MalaysiaPDPADPIAChildrenOrVulnerableDataSubjects bool     `json:"malaysiaPDPADPIAChildrenOrVulnerableDataSubjects"`
+		MalaysiaPDPADPIAHighRiskAutomatedDecisionMaking  bool     `json:"malaysiaPDPADPIAHighRiskAutomatedDecisionMaking"`
+		MalaysiaPDPADPIAOtherHighRiskFactors             *string  `json:"malaysiaPDPADPIAOtherHighRiskFactors"`
+		MalaysiaPDPADPIARecommendation                   string   `json:"malaysiaPDPADPIARecommendation"`
+		MalaysiaPDPADPIAReasons                          []string `json:"malaysiaPDPADPIAReasons"`
+		MalaysiaPDPADPIAAssessedByProfileID              *string  `json:"malaysiaPDPADPIAAssessedByProfileId"`
+		MalaysiaPDPADPIAAssessedAt                       *string  `json:"malaysiaPDPADPIAAssessedAt"`
+		MalaysiaPDPADPIARuleVersion                      *string  `json:"malaysiaPDPADPIARuleVersion"`
+		MalaysiaPDPADPIARuleSource                       *string  `json:"malaysiaPDPADPIARuleSource"`
+		CreatedAt                                        string   `json:"createdAt"`
+		UpdatedAt                                        string   `json:"updatedAt"`
 	} `json:"node"`
 }
 
@@ -129,6 +162,45 @@ func NewCmdView(f *cmdutil.Factory) *cobra.Command {
 
 			if a.Purpose != nil && *a.Purpose != "" {
 				_, _ = fmt.Fprintf(out, "%s%s\n", label.Render("Purpose:"), *a.Purpose)
+			}
+
+			if a.MalaysiaPDPADPIAAssessedAt != nil {
+				malaysiaLabel := lipgloss.NewStyle().Foreground(lipgloss.Color("242")).Width(44)
+
+				_, _ = fmt.Fprintln(out)
+				_, _ = fmt.Fprintln(out, bold.Render("Malaysia PDPA DPIA Screening"))
+				_, _ = fmt.Fprintf(out, "%s%s\n", malaysiaLabel.Render("Recommendation:"), a.MalaysiaPDPADPIARecommendation)
+				_, _ = fmt.Fprintf(out, "%s%d\n", malaysiaLabel.Render("Total Data Subjects:"), a.MalaysiaPDPADPIATotalDataSubjects)
+				_, _ = fmt.Fprintf(out, "%s%d\n", malaysiaLabel.Render("Sensitive Data Subjects:"), a.MalaysiaPDPADPIASensitiveDataSubjects)
+				_, _ = fmt.Fprintf(out, "%s%t\n", malaysiaLabel.Render("Legal or Significant Effects:"), a.MalaysiaPDPADPIALegalOrSignificantEffects)
+				_, _ = fmt.Fprintf(out, "%s%t\n", malaysiaLabel.Render("Systematic Monitoring:"), a.MalaysiaPDPADPIASystematicMonitoring)
+				_, _ = fmt.Fprintf(out, "%s%t\n", malaysiaLabel.Render("Innovative Technology:"), a.MalaysiaPDPADPIAInnovativeTechnology)
+				_, _ = fmt.Fprintf(out, "%s%t\n", malaysiaLabel.Render("Denial or Restriction of Rights:"), a.MalaysiaPDPADPIADenialOrRestrictionOfRights)
+				_, _ = fmt.Fprintf(out, "%s%t\n", malaysiaLabel.Render("Location or Behaviour Tracking:"), a.MalaysiaPDPADPIALocationOrBehaviourTracking)
+				_, _ = fmt.Fprintf(out, "%s%t\n", malaysiaLabel.Render("Children or Vulnerable Data Subjects:"), a.MalaysiaPDPADPIAChildrenOrVulnerableDataSubjects)
+				_, _ = fmt.Fprintf(out, "%s%t\n", malaysiaLabel.Render("High-Risk Automated Decision Making:"), a.MalaysiaPDPADPIAHighRiskAutomatedDecisionMaking)
+
+				if a.MalaysiaPDPADPIAOtherHighRiskFactors != nil && *a.MalaysiaPDPADPIAOtherHighRiskFactors != "" {
+					_, _ = fmt.Fprintf(out, "%s%s\n", malaysiaLabel.Render("Other High-Risk Factors:"), *a.MalaysiaPDPADPIAOtherHighRiskFactors)
+				}
+
+				if len(a.MalaysiaPDPADPIAReasons) > 0 {
+					_, _ = fmt.Fprintf(out, "%s%s\n", malaysiaLabel.Render("Reasons:"), strings.Join(a.MalaysiaPDPADPIAReasons, ", "))
+				}
+
+				if a.MalaysiaPDPADPIAAssessedByProfileID != nil {
+					_, _ = fmt.Fprintf(out, "%s%s\n", malaysiaLabel.Render("Assessed By Profile ID:"), *a.MalaysiaPDPADPIAAssessedByProfileID)
+				}
+
+				_, _ = fmt.Fprintf(out, "%s%s\n", malaysiaLabel.Render("Assessed:"), cmdutil.FormatTime(*a.MalaysiaPDPADPIAAssessedAt))
+
+				if a.MalaysiaPDPADPIARuleVersion != nil {
+					_, _ = fmt.Fprintf(out, "%s%s\n", malaysiaLabel.Render("Rule Version:"), *a.MalaysiaPDPADPIARuleVersion)
+				}
+
+				if a.MalaysiaPDPADPIARuleSource != nil {
+					_, _ = fmt.Fprintf(out, "%s%s\n", malaysiaLabel.Render("Rule Source:"), *a.MalaysiaPDPADPIARuleSource)
+				}
 			}
 
 			_, _ = fmt.Fprintln(out)

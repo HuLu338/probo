@@ -20,6 +20,7 @@
 
 import type { INodeProperties, IExecuteFunctions, INodeExecutionData, IDataObject } from 'n8n-workflow';
 import { proboApiRequestAllItems } from '../../GenericFunctions';
+import { malaysiaPDPADPIAFields } from './malaysia';
 
 export const description: INodeProperties[] = [
 	{
@@ -90,6 +91,7 @@ export async function execute(
 								lawfulBasis
 								createdAt
 								updatedAt
+								${malaysiaPDPADPIAFields}
 							}
 						}
 						pageInfo {

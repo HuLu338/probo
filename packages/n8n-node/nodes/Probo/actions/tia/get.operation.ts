@@ -20,6 +20,7 @@
 
 import type { INodeProperties, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { proboApiRequest } from '../../GenericFunctions';
+import { malaysiaTransferFields } from './malaysia';
 
 export const description: INodeProperties[] = [
 	{
@@ -56,6 +57,7 @@ export async function execute(
 					supplementaryMeasures
 					createdAt
 					updatedAt
+					${malaysiaTransferFields}
 				}
 			}
 		}
