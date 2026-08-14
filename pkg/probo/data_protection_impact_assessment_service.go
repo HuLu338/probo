@@ -183,7 +183,7 @@ func (s *DataProtectionImpactAssessmentService) Create(
 		return nil, err
 	}
 
-	now := time.Now()
+	now := time.Now().Truncate(time.Microsecond)
 
 	dpia := &coredata.DataProtectionImpactAssessment{
 		ID:                          gid.New(scope.GetTenantID(), coredata.DataProtectionImpactAssessmentEntityType),
@@ -258,7 +258,7 @@ func (s *DataProtectionImpactAssessmentService) Update(
 				dpia.ResidualRisk = req.ResidualRisk
 			}
 
-			dpia.UpdatedAt = time.Now()
+			dpia.UpdatedAt = time.Now().Truncate(time.Microsecond)
 
 			if err := dpia.Update(ctx, conn, scope); err != nil {
 				return fmt.Errorf("cannot update data protection impact assessment: %w", err)
