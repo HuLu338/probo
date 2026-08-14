@@ -26,6 +26,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type (
@@ -205,6 +206,61 @@ func (c *Client) FindMailpitMessage(
 	}
 
 	return nil, lastErr
+}
+
+// FindTokenFromMailpitSearch returns the first token query parameter found in
+// the plain-text body of a message returned by search.
+func (c *Client) FindTokenFromMailpitSearch(searchQuery string) (string, error) {
+	searchMails, err := c.SearchMails(searchQuery)
+	if err != nil {
+		return "", fmt.Errorf("mailpit search failed: %w", err)
+	}
+
+	if len(searchMails.Messages) == 0 {
+		return "", fmt.Errorf("mailpit search returned no messages for query %q", searchQuery)
+	}
+
+	var lastErr error
+
+	for _, msg := range searchMails.Messages {
+		messageID := msg.ResolvedID()
+		if messageID == "" {
+			lastErr = fmt.Errorf("mailpit search hit missing message id")
+
+			continue
+		}
+
+		detail, err := c.GetMailpitMessage(messageID)
+		if err != nil {
+			lastErr = fmt.Errorf("cannot load mailpit message %s: %w", messageID, err)
+
+			continue
+		}
+
+		if token := tokenFromMailpitMessage(detail); token != "" {
+			return token, nil
+		}
+
+		lastErr = fmt.Errorf("mailpit message %s contained no token link", messageID)
+	}
+
+	return "", lastErr
+}
+
+func tokenFromMailpitMessage(message *MailpitMessageDetail) string {
+	for _, field := range strings.Fields(message.Text) {
+		candidate := strings.Trim(field, `<>[](){},;"'`)
+		linkURL, err := url.Parse(candidate)
+		if err != nil || linkURL.Scheme == "" || linkURL.Host == "" {
+			continue
+		}
+
+		if token := linkURL.Query().Get("token"); token != "" {
+			return token
+		}
+	}
+
+	return ""
 }
 
 // FindLinkFromMailpitSearch scans all messages from search and returns the first
