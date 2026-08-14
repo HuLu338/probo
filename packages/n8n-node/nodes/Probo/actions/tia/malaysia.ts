@@ -20,6 +20,25 @@
 
 import type { IDataObject, IExecuteFunctions, INodeProperties } from 'n8n-workflow';
 
+export const malaysiaTransferFields = `
+	malaysiaTransferBasis
+	malaysiaDestinationCountry
+	malaysiaRecipientThirdPartyId
+	malaysiaReceiverRegistrationNumber
+	malaysiaReceiverContact
+	malaysiaTransferPurpose
+	malaysiaPersonalDataCategories
+	malaysiaSafeguards
+	malaysiaApprovalStatus
+	malaysiaApprovedByProfileId
+	malaysiaApprovalNotes
+	malaysiaReviewedAt
+	malaysiaNextReviewAt
+	malaysiaReviewEvidence
+	malaysiaRuleVersion
+	malaysiaRuleSource
+`;
+
 const basisOptions = [
 	{ name: 'Substantially Similar Law — Section 129(2)(a)', value: 'SUBSTANTIALLY_SIMILAR_LAW' },
 	{
